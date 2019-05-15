@@ -1,0 +1,30 @@
+{
+  "name": "phea",
+  "version": "0.0.5",
+  "description": "An unoffcial Phillips Hue Entertainment API library for Node.js.",
+  "main": "phea.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakeBednard/node-phea.git"
+  },
+  "keywords": [
+    "Phillips",
+    "Hue",
+    "Entertainment",
+    "API",
+    "Light"
+  ],
+  "author": "Jake Bednard",
+  "license": "MIT ",
+  "bugs": {
+    "url": "https://github.com/JakeBednard/node-phea/issues"
+  },
+  "homepage": "https://github.com/JakeBednard/node-phea#readme",
+  "dependencies": {
+    "node-dtls-client": "^0.5.6",
+    "request": "^2.88.0"
+  }
+}
