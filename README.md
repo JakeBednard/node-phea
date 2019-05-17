@@ -64,3 +64,13 @@ async function run() {
 
 run();
 ```
+
+## Photosensitive Seizure Warning (via Phillips Hue Documentation)
+```
+A very small percentage of people may experience a seizure when exposed to certain visual images, including flashing lights or patterns that may appear in video games. Even people who have no history of seizures or epilepsy may have an undiagnosed condition that can cause these “photosensitive epileptic seizures” while watching video with the additional light effects.These seizures may have a variety of symptoms, including lightheadedness, altered vision, eye or face twitching, jerking or shaking of arms or legs, disorientation, confusion, or momentary loss of awareness. Seizures may also cause loss of consciousness or convulsions that can lead to injury from falling down or striking nearby objects. Immediately stop project participation and consult a doctor if you experience any of these symptoms. Parents should watch for or ask their children about the above symptoms. Children and teenagers are more likely than adults to experience these seizures. The risk of photosensitive epileptic seizures may be reduced by taking the following precautions.
+
+    - Use it in a well-lit room
+    - Do not use it if you are drowsy or fatigued
+    - If you or any of your relatives have a history of seizures or epilepsy, consult a doctor before participation.
+
+```
