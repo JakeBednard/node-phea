@@ -1,10 +1,6 @@
 {
   "name": "phea",
-<<<<<<< HEAD
-  "version": "0.5.1",
-=======
-  "version": "0.0.5",
->>>>>>> 4b2850f... Squash + Rebase 0.5.1
+  "version": "0.5.2",
   "description": "An unoffcial Phillips Hue Entertainment API library for Node.js.",
   "main": "phea.js",
   "scripts": {
