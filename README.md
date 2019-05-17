@@ -19,7 +19,7 @@ for initial setup. This will have to be done for 1.0. Additionally, error handli
 npm install phea
 ```
 
-## Example:
+## Basic Example:
 ```javascript
 const Phea = require('phea');
 
