@@ -23,16 +23,6 @@ npm install phea
 ```javascript
 const Phea = require('phea');
 
-let config = {
-    "ip": "",                // Hue Bridge IP
-    "port": 2100,            // Hue Bridge DTLS Port (optional - default 2100) 
-    "username": "",          // Hue Entertainment API Username
-    "psk": "",               // Hue Entertainment API PSK
-    "group": 1,              // Hue Entertainment API Group
-    "numberOfLights": 1,     // Number of lights in Hue Entertainment Group [1-16]
-    "fps": 50                // FPS (Optional - default 50)
-};
-
 let running = true;
 process.on("SIGINT", function () {
     // Shut-down demo with ctrl+c
@@ -41,6 +31,16 @@ process.on("SIGINT", function () {
 });
 
 async function run() {
+
+    let config = {
+        "ip": "",                // Hue Bridge IP
+        "port": 2100,            // Hue Bridge DTLS Port (optional - default 2100) 
+        "username": "",          // Hue Entertainment API Username
+        "psk": "",               // Hue Entertainment API PSK
+        "group": 1,              // Hue Entertainment API Group
+        "numberOfLights": 1,     // Number of lights in Hue Entertainment Group [1-16]
+        "fps": 50                // FPS (Optional - default 50)
+    };
 
     let phea = new Phea(config);
     
