@@ -3,9 +3,10 @@
 
 class TransitionEnvelope {
 
-    constructor(hue, options) {
+    constructor(lightId, hue, options) {
         this._opts = options;
         this._hue = hue;
+        this._lightId = lightId;
         this._transitioning = false;
     }
 
@@ -20,9 +21,9 @@ class TransitionEnvelope {
         let i = 0;
         while(i < tween.framesInTransition && this._transitioning) {
 
-            this._hue.rgb.red += tween.dr;
-            this._hue.rgb.green += tween.dg;
-            this._hue.rgb.blue += tween.db;
+            this._hue._lights[this._lightId].red += tween.dr;
+            this._hue._lights[this._lightId].green += tween.dg;
+            this._hue._lights[this._lightId].blue += tween.db;
 
             i++;
 

@@ -21,6 +21,7 @@ async function run() {
 
     let phea = new Phea(config);
     let rgb = [0,0,0];
+    let tweenTime = 1000;
     
     await phea.start();
 
@@ -30,7 +31,7 @@ async function run() {
         rgb[1] = (rgb[1] + 170) % 256;
         rgb[2] = (rgb[2] + 255) % 256;
 
-        await phea.transitionColor(rgb, 1000, true);
+        await phea.transitionColor(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
     
     }
 

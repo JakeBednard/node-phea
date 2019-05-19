@@ -16,7 +16,12 @@ const dtls = require("node-dtls-client").dtls;
         this._renderLoop = null;
         this._msgSeqCounter = 0;
         
-        this.rgb = {red: 0, green: 0, blue: 0};
+        this._lights = [];
+        for(let id=0; id < this._opts.numberOfLights; id++) {
+            this._lights.push(
+                {red: 0, green: 0, blue: 0}
+            )
+        }
 
     }
 
@@ -111,11 +116,16 @@ const dtls = require("node-dtls-client").dtls;
     _generateMessage() {
 
         // Sample current color values.
-        const rgb = [
-            Math.abs(Math.floor(this.rgb.red)) % 256, 
-            Math.abs(Math.floor(this.rgb.green)) % 256, 
-            Math.abs(Math.floor(this.rgb.blue)) % 256
-        ];   
+        const rgb = [];
+
+        for(let id=0; id<this._opts.numberOfLights; id++) {
+            rgb.push([
+                Math.abs(Math.floor(this._lights[id].red)) % 256, 
+                Math.abs(Math.floor(this._lights[id].green)) % 256, 
+                Math.abs(Math.floor(this._lights[id].blue)) % 256
+            ]);
+        }
+           
 
         // Init temp array with 'HueStream' as bytes for protocol type definition
         const tempBuffer = [0x48, 0x75, 0x65, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d];
@@ -128,16 +138,16 @@ const dtls = require("node-dtls-client").dtls;
         tempBuffer.push(0x00);                              // Color Mode RGB
         tempBuffer.push(0x00);                              // Reserved          
 
-        for(let n=1; n<=this._opts.numberOfLights; n++) {   // For each light in group...
+        for(let n=0; n<this._opts.numberOfLights; n++) {    // For each light in group...
             tempBuffer.push(0x00);                          // Light Type Designation
             tempBuffer.push(0x00);                          // Light n ID (16-bit)
-            tempBuffer.push(n);                             // 
-            tempBuffer.push(rgb[0]);                        // Light n Red (16-bit) 
-            tempBuffer.push(rgb[0]);                        //  
-            tempBuffer.push(rgb[1]);                        // Light n Green (16-bit) 
-            tempBuffer.push(rgb[1]);                        // 
-            tempBuffer.push(rgb[2]);                        // Light n Blue (16-bit) 
-            tempBuffer.push(rgb[2]);                        // 
+            tempBuffer.push(n+1);                           // Offset lightId back to hue api.
+            tempBuffer.push(rgb[n][0]);                     // Light n Red (16-bit) 
+            tempBuffer.push(rgb[n][0]);                     //  
+            tempBuffer.push(rgb[n][1]);                     // Light n Green (16-bit) 
+            tempBuffer.push(rgb[n][1]);                     // 
+            tempBuffer.push(rgb[n][2]);                     // Light n Blue (16-bit) 
+            tempBuffer.push(rgb[n][2]);                     // 
         }
 
         this._msgSeqCounter = (this._msgSeqCounter + 1) % 256; 

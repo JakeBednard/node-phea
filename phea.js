@@ -24,11 +24,25 @@ class Phea {
         this._pheaEngine.stop();
     }
 
-    async transitionColor(rgb, tweenTime=0, block=false) {
+    async transitionColor(lights=[], rgb=[0,0,0], tweenTime=0, block=false) {
 
-        await this._checkTransitionColorOptions(rgb, tweenTime, block);
+        await this._checkTransitionColorOptions(lights, rgb, tweenTime, block);
 
-        await this._pheaEngine.transitionColor(rgb, tweenTime);
+        if (lights.length == 0) {
+            // Make array 1,2,3..numberOfLights
+            lights = await Array.from(Array(this._opts.numberOfLights).keys())  
+        }
+
+        let transitions = [];
+        lights.forEach(function(lightId) {
+            transitions.push({
+                'lightId': lightId,
+                'rgb': rgb,
+                'tweenTime': tweenTime
+            })
+        });
+
+        await this._pheaEngine.transitionColor(transitions);
         
         if (block) {
             await this._sleep(tweenTime);
@@ -36,7 +50,21 @@ class Phea {
 
     }
 
-    _checkTransitionColorOptions(rgb, tweenTime, block) {
+    _checkTransitionColorOptions(lights, rgb, tweenTime, block) {
+
+        if(!Array.isArray(lights)) {
+            throw new Error(
+                "PHEA [Transisition]: 'lights' must be an array of ints representing lights to transition."
+            );
+        }
+
+        lights.forEach(function(lightId) {
+            if (!Number.isInteger(lightId)) {
+                throw new Error(
+                    "PHEA [Transisition]: 'lights' must be an array of ints representing lights to transition."
+                ) 
+            }
+        });
 
         if (rgb.length != 3) {
             throw new Error(
