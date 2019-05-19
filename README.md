@@ -2,19 +2,20 @@
 
 An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/develop/hue-entertainment/) library for Node.js. The goal of this library is to encapsulate the Hue Entertainment API while leaving a developer to use a simple color API to control color state... More documentation coming soon, but this is currently working if you already have an entertainment group, username, and psk setup. 
 
+##### Current Version: 0.7.0
+
 ##### Please note that this API will be unstable until version 1.0. Use at your own risk.
 
 #### Features:
 - DTLS Communication Setup + Messaging for Phillips Hue Bridge Entertainment API.
-- Single color can be tweaked in real-time and will be reflected throughout entertainment group.
-- Controllable update rate (fps).
+- Multi-light capabilities to tweek/tween lights individually, or all at once.
+- Easy to use (3-command) API, while strict, allows the Hue Entertainment API to be abstracted away.
+- Performance so far seems pretty good at 50Hz. There's room for improvement, but I want to hold off optimization until >1.0.0.
 
-This is still a work-in-progress. Namely, I have the DTLS Entertainment API working, but there's no implementation
-for initial setup. Additionally, error handling will have to be done.
-
-1.0 is planned to have support for multilight in some form. Until then, I plan on keeping the mainline API the same. 
+This is still a work-in-progress. Use at your own risk. Things will stablize at 1.0.0.
 
 #### To-Do(s):
+- Reduce reliance on async methods.
 - Proper Error Handling.
 - Guide or library for setting up Hue Entertainment Secrets + Groups.
 
@@ -48,18 +49,17 @@ async function run() {
 
     let phea = new Phea(config);
     let rgb = [0,0,0];
+    let tweenTime = 1000;
     
     await phea.start();
 
     while(running) {
     
-        // Manipulate color state
         rgb[0] = (rgb[0] + 85) % 256;
         rgb[1] = (rgb[1] + 170) % 256;
         rgb[2] = (rgb[2] + 255) % 256;
 
-        // Transition to the new color over 1000 ms. Wait until then.
-        await phea.transitionColor(rgb, 1000, true);
+        await phea.transitionColor(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
     
     }
 
@@ -69,6 +69,32 @@ async function run() {
 
 run();
 ```
+
+## Options
+
+#### ip
+
+#### port
+
+#### username
+
+#### psk
+
+#### group
+
+#### numberOfLights
+
+#### fps
+
+## API
+
+### Phea
+
+### Phea.start()
+
+### Phea.stop()
+
+### Phea.transitionColor(lights=[], rgb=[0,0,0], tweenTime=0, block=false)
 
 ## Photosensitive Seizure Warning
 ###### (via Phillips Hue Documentation)
