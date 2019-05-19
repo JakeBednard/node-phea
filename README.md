@@ -8,7 +8,9 @@ An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/dev
 - Controllable update rate (fps).
 
 This is still a work-in-progress. Namely, I have the DTLS Entertainment API working, but there's no implementation
-for initial setup. This will have to be done for 1.0. Additionally, error handling will have to be done.
+for initial setup. Additionally, error handling will have to be done.
+
+1.0 is planned to have support for multilight in some form. Until then, I plan on keeping the mainline API the same. 
 
 #### To-Do(s):
 - Proper Error Handling.
@@ -25,7 +27,7 @@ const Phea = require('phea');
 
 let running = true;
 process.on("SIGINT", function () {
-    // Shut-down demo with ctrl+c
+    // Stop example with ctrl+c
     console.log('SIGINT Detected. Shutting down...');
     running = false;
 });
@@ -33,28 +35,29 @@ process.on("SIGINT", function () {
 async function run() {
 
     let config = {
-        "ip": "",                // Hue Bridge IP
-        "port": 2100,            // Hue Bridge DTLS Port (optional - default 2100) 
-        "username": "",          // Hue Entertainment API Username
-        "psk": "",               // Hue Entertainment API PSK
-        "group": 1,              // Hue Entertainment API Group
-        "numberOfLights": 1,     // Number of lights in Hue Entertainment Group [1-16]
-        "fps": 50                // FPS (Optional - default 50)
-    };
+        "ip": "192.168.1.10",
+        "port": 2100,
+        "username": "",
+        "psk": "",
+        "group": 1,
+        "numberOfLights": 1,
+        "fps": 50
+    }
 
     let phea = new Phea(config);
+    let rgb = [0,0,0];
     
-    phea.start();
+    await phea.start();
 
     while(running) {
     
-        phea.red += 85;
-        phea.green += 170;
-        phea.blue += 255;
-    
-        await new Promise(r => {
-            setTimeout(r, (1000 / (config.fps/2)));
-        });
+        // Manipulate color state
+        rgb[0] = (rgb[0] + 85) % 256;
+        rgb[1] = (rgb[1] + 170) % 256;
+        rgb[2] = (rgb[2] + 255) % 256;
+
+        // Transition to the new color over 1000 ms. Wait until then.
+        await phea.transitionColor(rgb, 1000, true);
     
     }
 
