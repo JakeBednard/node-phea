@@ -2,7 +2,7 @@
 
 An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/develop/hue-entertainment/) library for Node.js. The goal of this library is to encapsulate the Hue Entertainment API while leaving a developer to use a simple color API to control color state... More documentation coming soon, but this is currently working if you already have an entertainment group, username, and psk setup. 
 
-##### Current Version: 0.7.0
+##### Current Version: 0.7.2
 
 ##### Please note that this API will be unstable until version 1.0. Use at your own risk.
 
@@ -59,7 +59,7 @@ async function run() {
         rgb[1] = (rgb[1] + 170) % 256;
         rgb[2] = (rgb[2] + 255) % 256;
 
-        await phea.transitionColor(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
+        await phea.transition(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
     
     }
 

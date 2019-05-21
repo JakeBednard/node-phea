@@ -24,13 +24,13 @@ class Phea {
         this._pheaEngine.stop();
     }
 
-    async transitionColor(lights=[], rgb=[0,0,0], tweenTime=0, block=false) {
+    async transition(lights=[], rgb=[0,0,0], tweenTime=0, block=false) {
 
-        await this._checkTransitionColorOptions(lights, rgb, tweenTime, block);
+        await this._checkTransitionOptions(lights, rgb, tweenTime, block);
 
         if (lights.length == 0) {
             // Make array 1,2,3..numberOfLights
-            lights = await Array.from(Array(this._opts.numberOfLights).keys())  
+            lights = Array.from(Array(this._opts.numberOfLights).keys())  
         }
 
         let transitions = [];
@@ -42,7 +42,7 @@ class Phea {
             })
         });
 
-        await this._pheaEngine.transitionColor(transitions);
+        await this._pheaEngine.transition(transitions);
         
         if (block) {
             await this._sleep(tweenTime);
@@ -50,7 +50,7 @@ class Phea {
 
     }
 
-    _checkTransitionColorOptions(lights, rgb, tweenTime, block) {
+    _checkTransitionOptions(lights, rgb, tweenTime, block) {
 
         if(!Array.isArray(lights)) {
             throw new Error(

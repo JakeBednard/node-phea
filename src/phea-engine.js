@@ -25,7 +25,7 @@ class PheaEngine {
         this._hue.stop();
     }
 
-    transitionColor(transitions) {
+    transition(transitions) {
         transitions.forEach((transition) => {
             this._lights[transition.lightId].transitionColor(transition.rgb, transition.tweenTime);     
         });

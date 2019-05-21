@@ -59,7 +59,7 @@ const dtls = require("node-dtls-client").dtls;
 
         await this._setHueBridgeDtlsState(true);
 
-        while(!this._running && maxAttempts-- >= 0) {
+        while(!this._running && maxAttempts-- > 0) {
 
             this._socket = await dtls.createSocket(config)
             .on("connected", () => {

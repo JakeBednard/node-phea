@@ -23,13 +23,13 @@ async function run() {
     
     await phea.start();
 
-    await phea.transitionColor(lights=[], rgb=[0,0,0], 100);
+    await phea.transition(lights=[], rgb=[0,0,0], 100);
 
     let tween = 5000;
     while(running) {
 
         for(let i=0; i<config.numberOfLights; i++) {
-            await phea.transitionColor(lights=[i], rgb=randomColor(120, 230), tween);
+            await phea.transition(lights=[i], rgb=randomColor(120, 230), tween);
         }
 
         await sleep(tween);
