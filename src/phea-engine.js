@@ -26,16 +26,9 @@ class PheaEngine {
     }
 
     transitionColor(transitions) {
-
         transitions.forEach((transition) => {
             this._lights[transition.lightId].transitionColor(transition.rgb, transition.tweenTime);     
         });
-        
-    }
-
-    /** Wrapper for async ms sleeping */
-    async _sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 }

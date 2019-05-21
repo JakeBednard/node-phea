@@ -18,24 +18,28 @@ const dtls = require("node-dtls-client").dtls;
         
         this._lights = [];
         for(let id=0; id < this._opts.numberOfLights; id++) {
-            this._lights.push(
-                {red: 0, green: 0, blue: 0}
-            )
+            this._lights.push( {red: 0, green: 0, blue: 0} );
         }
 
     }
 
-    async start() {
-        await this._openHueBridgeDtlsSocket();
-        this._renderLoop = setInterval(() => {  
-            const message = this._generateMessage();
-            this._socket.send(message);
-        }, (1000/this._opts.fps));
+    start() {
+        this._openHueBridgeDtlsSocket();
     }
 
     stop() {
-        clearInterval(this._renderLoop);
+        clearTimeout(this._renderLoop);
         this._closeHueBridgeDtlsSocket();
+    }
+
+    _loop() {
+
+        if (this._running) {
+            const message = this._generateMessage();
+            this._socket.send(message);
+            this._renderLoop = setTimeout(() => { this._loop(); }, 1000/this._opts.fps);
+        }
+
     }
 
     async _openHueBridgeDtlsSocket() {
@@ -51,16 +55,17 @@ const dtls = require("node-dtls-client").dtls;
 
         config.psk[this._opts.username] = Buffer.from(this._opts.psk, 'hex');
 
-        await this._setHueBridgeDtlsState(true);
-
         let maxAttempts = this._opts.maxSocketConnectAttempts;
 
+        await this._setHueBridgeDtlsState(true);
+
         while(!this._running && maxAttempts-- >= 0) {
-            
+
             this._socket = await dtls.createSocket(config)
             .on("connected", () => {
                 console.log("PHEA [DTLS]: Socket Established");
                 this._running = true;
+                this._loop();
             })
             .on("error", e => {
                 console.log("PHEA [DTLS]: Socket Failed: Retrying...");
@@ -75,7 +80,7 @@ const dtls = require("node-dtls-client").dtls;
                 console.log("PHEA [DTLS]: Socket Closed");
             });
 
-            await this._sleep(this._opts.socketTimeout + 10);
+            await this._sleep(this._opts.socketTimeout + 5);
 
         }
 
@@ -117,7 +122,6 @@ const dtls = require("node-dtls-client").dtls;
 
         // Sample current color values.
         const rgb = [];
-
         for(let id=0; id<this._opts.numberOfLights; id++) {
             rgb.push([
                 Math.abs(Math.floor(this._lights[id].red)) % 256, 
@@ -157,7 +161,7 @@ const dtls = require("node-dtls-client").dtls;
     }
 
     async _sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return await new Promise(resolve => setTimeout(resolve, ms));
     }
 
 }

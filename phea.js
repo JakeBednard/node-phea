@@ -5,7 +5,7 @@ const PheaEngine = require('./src/phea-engine');
 const DEFAULT_PORT = 2100;
 const DEFAULT_FPS = 50;
 const DEFAULT_MIN_FPS = 10;
-const DEFAULT_MAX_FPS = 60;
+const DEFAULT_MAX_FPS = 120;
 const DEFAULT_MAX_SOCKET_CONNECT_ATTEMPTS = 5;
 const DEFAULT_SOCKET_TIMEOUT_MS = 500;
 
@@ -148,11 +148,12 @@ class Phea {
 
         if (opts.fps) {
             if (typeof(opts.fps) !== 'number') throw new Error(
-                "PHEA [Configuration]: 'fps' must be of type int between" + 
-                DEFAULT_MIN_FPS + "and" + DEFAULT_MAX_FPS + "inclusive."
+                "PHEA [Configuration]: 'fps' must be of type int between " + 
+                DEFAULT_MIN_FPS + " and " + DEFAULT_MAX_FPS + " inclusive."
             );
             if (opts.fps < DEFAULT_MIN_FPS || opts.fps > DEFAULT_MAX_FPS)  throw new Error(
-                "PHEA [Configuration]: 'fps' must be between" + DEFAULT_MIN_FPS + "and" + DEFAULT_MAX_FPS + "inclusive."
+                "PHEA [Configuration]: 'fps' must be between " + DEFAULT_MIN_FPS + 
+                " and " + DEFAULT_MAX_FPS + " inclusive."
             );
         }
         else {

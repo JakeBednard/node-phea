@@ -10,6 +10,7 @@ class Light {
         this._opts = options;
         this._hue = hue;
         this._envelope = null;
+        this._renderLoop = null;
     }
 
     async transitionColor(rgb, tweenTime) {
@@ -47,12 +48,7 @@ class Light {
         };
 
     }
-
-    /** Wrapper for async ms sleeping */
-    async _sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
+    
 }
 
 module.exports = Light;
