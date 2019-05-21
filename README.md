@@ -88,13 +88,13 @@ run();
 
 ## API
 
-### Phea
+#### Phea
 
-### Phea.start()
+#### Phea.start()
 
-### Phea.stop()
+#### Phea.stop()
 
-### Phea.transitionColor(lights=[], rgb=[0,0,0], tweenTime=0, block=false)
+#### Phea.transitionColor(lights=[], rgb=[0,0,0], tweenTime=0, block=false)
 
 ## Photosensitive Seizure Warning
 ###### (via Phillips Hue Documentation)
