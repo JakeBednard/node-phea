@@ -132,10 +132,20 @@ One distinction with this API is that light channel input numbers, numbering sta
 numbering at 1. So when placing your lights channels, recall n-1, to place the value. 
 
 ##### rgb=[0,0,0]
+This is the color the you want the transition the selected lights to. This is a 3-value array where each value is a 
+uint8 representing the red, green, blue color bytes respectively. This color will be tweened to over the duration of
+tweenTime.
 
 ##### tweenTime=0
+This is the amount of time in milliseconds that the transition will take to tween from the existing color to
+the new color. Default is 0, which means that the color change will occur on the next update to the Hue Bridge.
+I don't see any performance concerns yet, but I'm trying to start finding ways to do profiling. Though, with an update
+rate at 50fps, you're still looking at 15-20ms to render you're next color setting. That it typlically ample, and if not,
+the framerate can be lowered to accomodate.
 
 ##### block=false
+If you're calling the transition in a synchronous piece of code, set block to true, and the transition will
+hold execution for the duration of the light transition. 
 
 
 ## Photosensitive Seizure Warning
