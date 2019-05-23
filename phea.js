@@ -16,8 +16,8 @@ class Phea {
         this._pheaEngine = new PheaEngine(this._opts);
     }
 
-    start() {
-        this._pheaEngine.start();
+    async start() {
+        await this._pheaEngine.start();
     }
 
     stop() {

@@ -23,8 +23,8 @@ const dtls = require("node-dtls-client").dtls;
 
     }
 
-    start() {
-        this._openHueBridgeDtlsSocket();
+    async start() {
+        await this._openHueBridgeDtlsSocket();
     }
 
     stop() {

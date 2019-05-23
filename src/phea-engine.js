@@ -17,8 +17,8 @@ class PheaEngine {
         }
     }
 
-    start() {
-        this._hue.start();
+    async start() {
+        await this._hue.start();
     }
 
     stop() {
