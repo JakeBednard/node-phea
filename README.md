@@ -105,12 +105,38 @@ start looking to optimize out the library.
 ## API
 
 #### Phea(options)
+The creation of this object sets up the control ecosystem for Phea. The main parts of this ecosystem are the Hue Bridge
+controller and the lights which maintain transition math. The core is called the Phea Engine where we strap all the parts 
+together and put it behind an API. On top of that API, we added another API for up-front input checking for inputs that are
+going to cause failures. Here, I have elected to throw errors, so bugs can be worked out sooner than later.
 
 #### Phea.start()
+This opens the DTLS socket with the Hue Bridge, then kicks the rendering loop into action. While the engine is
+hidden behind the API, the engine itself is always throwing renders to the Bridge every (1000/fps) milliseconds. 
+This is done to keep the light completely in-sync as well as maintain an open connection with the Bridge. This returns
+a promise waiting for the establishment of the socket to the Bridge. You should wait for this to happen before any
+other communication happens.
 
 #### Phea.stop()
+Shut it all down, exit the render loops, release the socket. Sometime a frame can hang and it'll take a second or two to 
+fully return. I'm looking into this, but its a minor inconvienence.
 
 #### Phea.transition(lights=[], rgb=[0,0,0], tweenTime=0, block=false)
+Phea color changes are facilated through the transition method. Every color change, on every light, consist of a timeout 
+loop to handle the math of updating and rendering colors to its respective light. These timeout loops can be interrupted and
+replaced at any point, even immediately. This allows transitions to be set in real-time to control the lights. Keep in mind, even if tween time is set to 0, you'll still ultimately be limited by the Hue Bridge 12.5hz update rate.
+
+##### lights=[]:
+The light channels to send this color transition to. The default ([]) selects all of the lights (options.numberofLights).
+One distinction with this API is that light channel input numbers, numbering starts at 0, where as, the Hue Bridge starts
+numbering at 1. So when placing your lights channels, recall n-1, to place the value. 
+
+##### rgb=[0,0,0]
+
+##### tweenTime=0
+
+##### block=false
+
 
 ## Photosensitive Seizure Warning
 ###### (via Phillips Hue Documentation)
