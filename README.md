@@ -11,6 +11,7 @@ An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/dev
 - Multi-light capabilities to tweek/tween lights individually, or all at once.
 - Easy to use (3-command) API, while strict, allows the Hue Entertainment API to be abstracted away.
 - Performance so far seems pretty good at 50Hz. There's room for improvement, but I want to hold off optimization until >1.0.0.
+- Total computation time needed for 10-lights per frame is <0.1ms (~60 microseconds).
 
 This is still a work-in-progress. Use at your own risk. Things will stablize at 1.0.0.
 
