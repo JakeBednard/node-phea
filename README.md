@@ -4,8 +4,6 @@ An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/dev
 
 ##### Current Version: 0.7.8
 
-##### Please note that this API will be unstable until version 1.0. Use at your own risk.
-
 #### Features:
 - DTLS Communication Setup + Messaging for Phillips Hue Bridge Entertainment API.
 - Multi-light capabilities to tweek/tween lights individually, or all at once.
@@ -13,7 +11,8 @@ An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/dev
 - Performance so far seems pretty good at 50Hz. There's room for improvement, but I want to hold off optimization until >1.0.0.
 - Total computation time needed for 10-lights per frame is <0.1ms (~60 microseconds).
 
-This is still a work-in-progress. Use at your own risk. Things will stablize at 1.0.0.
+This is still a work-in-progress. That being said, the front facing API will likely not change, so it will remain mostly 
+likely safe to develop around Phea.
 
 #### To-Do(s):
 - Reduce reliance on async methods.
