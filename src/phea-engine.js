@@ -2,7 +2,6 @@
 
 const HueController = require("./hue-controller");
 const Light = require("./light");
-const TransitionEnvelope = require("./transition-envelope");
 
 
 class PheaEngine {
