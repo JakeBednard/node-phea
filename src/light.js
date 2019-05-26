@@ -22,11 +22,9 @@ class Light {
         while(true) {
         
             if (tween.frames-- > 0) {
-
                 this._rgb[0] += tween.dr;
                 this._rgb[1] += tween.dg;
-                this._rgb[2] += tween.db;
-            
+                this._rgb[2] += tween.db;   
             }
 
             yield this._rgb;

@@ -29,20 +29,18 @@ class Phea {
         this._checkTransitionOptions(lights, rgb, tweenTime, block);
 
         if (lights.length == 0) {
-            // Make array 1,2,3..numberOfLights
-            lights = Array.from(Array(this._opts.numberOfLights).keys())  
+            for(let i=0; i<this._opts.numberOfLights; i++) { lights.push(i) }  
         }
 
         let transitions = [];
-        lights.forEach(function(lightId) {
-            transitions.push({
-                'lightId': lightId,
-                'rgb': rgb,
-                'tweenTime': tweenTime
-            })
+
+        lights.forEach((lightId) => {
+            transitions.push(
+                this._pheaEngine.transition(lightId, rgb, tweenTime)
+            );
         });
 
-        await this._pheaEngine.transition(transitions);
+        await Promise.all(transitions);
         
         if (block) {
             await this._sleep(tweenTime);

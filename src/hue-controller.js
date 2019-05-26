@@ -4,43 +4,29 @@ const util = require('util');
 const Buffer = require('buffer').Buffer;
 const Request = require('request');
 const dtls = require("node-dtls-client").dtls;
-const Light = require("./light");
 
 
  class HueController {
 
-    constructor(options) {
-        
+    constructor(lights, options) {
+        this._lights = lights;
         this._opts = options;
-        this._running = false;
         this._socket = null;
-        this._renderLoop = null;
+        this._running = false;
         this._msgSeqCounter = 0;
-        
-        this.lights = [];
-        for(let id=0; id < this._opts.numberOfLights; id++) {
-            this.lights.push(new Light(id, options));
-        }
-
     }
 
     async start() {
         await this._openHueBridgeDtlsSocket();
     }
 
-    stop() {
-        clearTimeout(this._renderLoop);
-        this._closeHueBridgeDtlsSocket();
+    async stop() {
+        await this._closeHueBridgeDtlsSocket();
     }
 
-    _loop() {
-
-        if (this._running) {
-            this._renderLoop = setTimeout(() => { this._loop(); }, (1000 / this._opts.fps))
-            const message = this._generateMessage();
-            this._socket.send(message);     
-        }
-
+    async render(rgb) {
+        const message = this._generateMessage(rgb);
+        await this._socket.send(message);
     }
 
     async _openHueBridgeDtlsSocket() {
@@ -56,17 +42,15 @@ const Light = require("./light");
 
         config.psk[this._opts.username] = Buffer.from(this._opts.psk, 'hex');
 
-        let maxAttempts = this._opts.maxSocketConnectAttempts;
-
         await this._setHueBridgeDtlsState(true);
 
+        let maxAttempts = this._opts.maxSocketConnectAttempts;
         while(!this._running && maxAttempts-- > 0) {
 
             this._socket = await dtls.createSocket(config)
             .on("connected", () => {
                 console.log("PHEA [DTLS]: Socket Established");
                 this._running = true;
-                this._loop();
             })
             .on("error", e => {
                 console.log("PHEA [DTLS]: Socket Failed: Retrying...");
@@ -91,9 +75,9 @@ const Light = require("./light");
 
     }
 
-    _closeHueBridgeDtlsSocket() {
-        this._socket.close();
-        this._setHueBridgeDtlsState(false);
+    async _closeHueBridgeDtlsSocket() {
+        await this._socket.close();
+        await this._setHueBridgeDtlsState(false);
     }
 
     async _setHueBridgeDtlsState(state=true) {
@@ -114,23 +98,11 @@ const Light = require("./light");
             } 
         });
 
-        // Allow bridge to stablize Dtls state before proceeding.
-        await this._sleep(100);
+        await this._sleep(100); // Allow bridge to stablize Dtls state before proceeding.
 
     }
 
-   _generateMessage() {
-
-        // Sample current color values.
-        const rgb = [];
-        for(let id=0; id<this._opts.numberOfLights; id++) {
-            let color = this.lights[id].gen.next().value;
-            rgb.push([
-                Math.abs(Math.floor(color[0])) % 256, 
-                Math.abs(Math.floor(color[1])) % 256, 
-                Math.abs(Math.floor(color[2])) % 256
-            ]);
-        }
+   _generateMessage(rgb) {
 
         // Init temp array with 'HueStream' as bytes for protocol type definition
         const tempBuffer = [0x48, 0x75, 0x65, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d];
@@ -143,7 +115,7 @@ const Light = require("./light");
         tempBuffer.push(0x00);                              // Color Mode RGB
         tempBuffer.push(0x00);                              // Reserved          
 
-        for(let n=0; n<this._opts.numberOfLights; n++) {    // For each light in group...
+        for(let n=0; n<rgb.length; n++) {                   // For each light in group...
             tempBuffer.push(0x00);                          // Light Type Designation
             tempBuffer.push(0x00);                          // Light n ID (16-bit)
             tempBuffer.push(n+1);                           // Offset lightId back to hue api.
@@ -161,8 +133,8 @@ const Light = require("./light");
 
     }
 
-    async _sleep(ms) {
-        return await new Promise(resolve => setTimeout(resolve, ms));
+    _sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 }
