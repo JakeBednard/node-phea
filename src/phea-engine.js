@@ -2,6 +2,7 @@
 
 const HueController = require("./hue-controller");
 const Light = require("./light");
+const Texture = require("./textures/texture");
 
 
 class PheaEngine {
@@ -11,6 +12,7 @@ class PheaEngine {
         this._running = false;
         this._renderLoop = null;
         this._lights = [];
+        this._textures = [];
         for(let id=0; id < this._opts.numberOfLights; id++) {
             this._lights.push(new Light(id, options));
         }
@@ -35,20 +37,26 @@ class PheaEngine {
         await this._lights[lightId].transitionColor(rgb, tweenTime);
     }
 
-    _loop() {
+    async texture(lights, type, duration, depth) {
+        let newTexture = new Texture[type](duration, depth, this._opts.fps);
+        lights.forEach(lightId => { this._lights[lightId].textures.push(newTexture); });
+        this._textures.push(newTexture);
+    }
+
+    async _loop() {
         if (this._running) {
             this._renderLoop = setTimeout(() => { this._loop(); }, (1000 / this._opts.fps));
-            let rgb = this._step();
-            this._hue.render(rgb);
+            let rgb = await this._step();
+            await this._hue.render(rgb);
         }
     }
 
-    _step() {
+    async _step() {
         let rgb = [];
-        this._lights.forEach((light) => {
+        await this._lights.forEach((light) => {
             rgb.push(light.gen.next().value);
         });
-        // effect
+        await this._textures.forEach(texture => texture.step());
         return rgb;
     }
 

@@ -7,6 +7,7 @@ class Light {
         this.id = id;
         this._opts = options;
         this._rgb = [0,0,0];
+        this.textures = [];
         this.gen = null;
         this.transitionColor([0,0,0], 0); // Setup generator;
     }
@@ -27,7 +28,13 @@ class Light {
                 this._rgb[2] += tween.db;   
             }
 
-            yield this._rgb;
+            let sample = [this._rgb[0], this._rgb[1], this._rgb[2]]
+            this.textures.forEach(texture => {
+                sample = texture.raster(sample);
+            });
+            console.log('sample', sample);
+
+            yield sample;
         
         }
 

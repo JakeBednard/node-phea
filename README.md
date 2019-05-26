@@ -2,7 +2,7 @@
 
 An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/develop/hue-entertainment/) library for Node.js. The goal of this library is to encapsulate the Hue Entertainment API while leaving a developer to use a simple color API to control color state... More documentation coming soon, but this is currently working if you already have an entertainment group, username, and psk setup. 
 
-##### Current Version: 0.7.6
+##### Current Version: 0.7.7
 
 ##### Please note that this API will be unstable until version 1.0. Use at your own risk.
 
@@ -53,6 +53,8 @@ async function run() {
     let tweenTime = 1000;
     
     await phea.start();
+
+    phea.texture(lights=[], type='sine', duration=2000, depth=40);
 
     while(running) {
     
@@ -147,6 +149,23 @@ the framerate can be lowered to accomodate.
 If you're calling the transition in a synchronous piece of code, set block to true, and the transition will
 hold execution for the duration of the light transition. 
 
+#### Phea.texture(lights=[], type, duration, depth)
+
+##### lights=[]:
+The light channels to send this color transition to. The default ([]) selects all of the lights (options.numberofLights).
+One distinction with this API is that light channel input numbers, numbering starts at 0, where as, the Hue Bridge starts
+numbering at 1. So when placing your lights channels, recall n-1, to place the value. 
+
+##### type: 
+Either 'sine' or 'square':
+- 'sine' is a sin wave that oscilates at 1/duration hz with an amplitude of depth.
+- 'square' is a square wave that oscilates at 1/duration hz with an amplitude of depth.
+
+##### duration:
+Integer cycle length for oscillator in milliseconds.
+
+##### depth:
+The amount of pixel color shift that will be oscillated by the texture. Value is integer [1,255].
 
 ## Photosensitive Seizure Warning
 ###### (via Phillips Hue Documentation)

@@ -48,6 +48,16 @@ class Phea {
 
     }
 
+    async texture(lights=[], type, duration, depth) {
+
+        if (lights.length == 0) {
+            for(let i=0; i<this._opts.numberOfLights; i++) { lights.push(i) }  
+        }
+
+        await this._pheaEngine.texture(lights, type, duration, depth);
+
+    }
+
     _checkTransitionOptions(lights, rgb, tweenTime, block) {
 
         if(!Array.isArray(lights)) {

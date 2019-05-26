@@ -25,6 +25,8 @@ async function run() {
     
     await phea.start();
 
+    phea.texture(lights=[], type='sine', duration=2000, depth=40);
+
     while(running) {
     
         rgb[0] = (rgb[0] + 85) % 256;
