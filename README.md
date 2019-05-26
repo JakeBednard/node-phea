@@ -2,7 +2,7 @@
 
 An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/develop/hue-entertainment/) library for Node.js. The goal of this library is to encapsulate the Hue Entertainment API while leaving a developer to use a simple color API to control color state... More documentation coming soon, but this is currently working if you already have an entertainment group, username, and psk setup. 
 
-##### Current Version: 0.7.7
+##### Current Version: 0.7.8
 
 ##### Please note that this API will be unstable until version 1.0. Use at your own risk.
 

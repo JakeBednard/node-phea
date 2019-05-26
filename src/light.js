@@ -32,7 +32,6 @@ class Light {
             this.textures.forEach(texture => {
                 sample = texture.raster(sample);
             });
-            console.log('sample', sample);
 
             yield sample;
         
