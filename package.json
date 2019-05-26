@@ -1,6 +1,6 @@
 {
   "name": "phea",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "An unoffcial Phillips Hue Entertainment API library for Node.js.",
   "main": "phea.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "Light"
   ],
   "author": "Jake Bednard",
-  "license": "MIT ",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/JakeBednard/node-phea/issues"
   },

@@ -1,31 +1,37 @@
 "use strict";
 
-const TransitionEnvelope = require("./transition-envelope");
-
 
 class Light {
 
-    constructor(id, hue, options) {
-        this._id = id;
+    constructor(id, options) {
+        this.id = id;
         this._opts = options;
-        this._hue = hue;
-        this._envelope = null;
-        this._renderLoop = null;
+        this._rgb = [0,0,0];
+        this.gen = null;
+        this.transitionColor([0,0,0], 0); // Setup generator;
     }
 
     async transitionColor(rgb, tweenTime) {
+        this.gen = await this._setTransition(rgb, tweenTime);
+    }
 
-        let tween = await this._calculateTween(rgb, tweenTime);
+    * _setTransition(rgb, tweenTime) {
 
-        if (this._envelope != null) {
-            await this._envelope.stop();
-            this._envelope = null;
+        let tween = this._calculateTween(rgb, tweenTime);
+
+        while(true) {
+        
+            if (tween.frames-- > 0) {
+
+                this._rgb[0] += tween.dr;
+                this._rgb[1] += tween.dg;
+                this._rgb[2] += tween.db;
+            
+            }
+
+            yield this._rgb;
+        
         }
-
-        let envelope = await new TransitionEnvelope(this._id, this._hue, this._opts);
-        envelope.transitionColor(tween);
-
-        this._envelope = envelope; 
 
     }
 
@@ -36,15 +42,15 @@ class Light {
 
         let framesInTransition = Math.floor(tweenTime / singleFrameMs);
        
-        let dr = (rgb[0] - this._hue._lights[this._id].red) / framesInTransition;
-        let dg = (rgb[1] - this._hue._lights[this._id].green) / framesInTransition;
-        let db = (rgb[2] - this._hue._lights[this._id].blue) / framesInTransition;
+        let dr = (rgb[0] - this._rgb[0]) / framesInTransition;
+        let dg = (rgb[1] - this._rgb[1]) / framesInTransition;
+        let db = (rgb[2] - this._rgb[2]) / framesInTransition;
 
         return {
             'dr': dr,
             'dg': dg,
             'db': db,
-            'framesInTransition': framesInTransition
+            'frames': framesInTransition
         };
 
     }

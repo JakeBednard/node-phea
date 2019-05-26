@@ -31,7 +31,7 @@ async function run() {
         rgb[1] = (rgb[1] + 170) % 256;
         rgb[2] = (rgb[2] + 255) % 256;
 
-        await phea.transitionColor(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
+        await phea.transition(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
     
     }
 

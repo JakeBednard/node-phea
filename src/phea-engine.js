@@ -21,14 +21,18 @@ class PheaEngine {
         await this._hue.start();
     }
 
-    stop() {
-        this._hue.stop();
+    async stop() {
+        await this._hue.stop();
     }
 
-    transition(transitions) {
+    async transition(transitions) {
+        let promises = [];
         transitions.forEach((transition) => {
-            this._lights[transition.lightId].transitionColor(transition.rgb, transition.tweenTime);     
+            promises.push(
+                this._hue.lights[transition.lightId].transitionColor(transition.rgb, transition.tweenTime)
+            );     
         });
+        await Promise.all(promises);
     }
 
 }

@@ -20,13 +20,13 @@ class Phea {
         await this._pheaEngine.start();
     }
 
-    stop() {
-        this._pheaEngine.stop();
+    async stop() {
+        await this._pheaEngine.stop();
     }
 
     async transition(lights=[], rgb=[0,0,0], tweenTime=0, block=false) {
 
-        await this._checkTransitionOptions(lights, rgb, tweenTime, block);
+        this._checkTransitionOptions(lights, rgb, tweenTime, block);
 
         if (lights.length == 0) {
             // Make array 1,2,3..numberOfLights

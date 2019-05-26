@@ -4,6 +4,7 @@ const util = require('util');
 const Buffer = require('buffer').Buffer;
 const Request = require('request');
 const dtls = require("node-dtls-client").dtls;
+const Light = require("./light");
 
 
  class HueController {
@@ -16,9 +17,9 @@ const dtls = require("node-dtls-client").dtls;
         this._renderLoop = null;
         this._msgSeqCounter = 0;
         
-        this._lights = [];
+        this.lights = [];
         for(let id=0; id < this._opts.numberOfLights; id++) {
-            this._lights.push( {red: 0, green: 0, blue: 0} );
+            this.lights.push(new Light(id, options));
         }
 
     }
@@ -35,9 +36,9 @@ const dtls = require("node-dtls-client").dtls;
     _loop() {
 
         if (this._running) {
+            this._renderLoop = setTimeout(() => { this._loop(); }, (1000 / this._opts.fps))
             const message = this._generateMessage();
-            this._socket.send(message);
-            this._renderLoop = setTimeout(() => { this._loop(); }, 1000/this._opts.fps);
+            this._socket.send(message);     
         }
 
     }
@@ -118,18 +119,18 @@ const dtls = require("node-dtls-client").dtls;
 
     }
 
-    _generateMessage() {
+   _generateMessage() {
 
         // Sample current color values.
         const rgb = [];
         for(let id=0; id<this._opts.numberOfLights; id++) {
+            let color = this.lights[id].gen.next().value;
             rgb.push([
-                Math.abs(Math.floor(this._lights[id].red)) % 256, 
-                Math.abs(Math.floor(this._lights[id].green)) % 256, 
-                Math.abs(Math.floor(this._lights[id].blue)) % 256
+                Math.abs(Math.floor(color[0])) % 256, 
+                Math.abs(Math.floor(color[1])) % 256, 
+                Math.abs(Math.floor(color[2])) % 256
             ]);
         }
-           
 
         // Init temp array with 'HueStream' as bytes for protocol type definition
         const tempBuffer = [0x48, 0x75, 0x65, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d];
