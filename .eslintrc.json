@@ -1,6 +1,7 @@
 {
     "env": {
-        "browser": true,
+        "browser": false,
+        "node": true,
         "es6": true
     },
     "extends": "eslint:recommended",
@@ -13,5 +14,6 @@
         "sourceType": "module"
     },
     "rules": {
+        "no-undef": "error"
     }
 }

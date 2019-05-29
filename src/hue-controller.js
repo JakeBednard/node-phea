@@ -58,6 +58,7 @@ module.exports = class HueController {
     
         let socketCreated = false;
 
+        // @ts-ignore
         let socket = await dtls.createSocket(config)
         .on("connected", () => {
             logger.info("DTLS: Socket Established.");
@@ -158,7 +159,7 @@ module.exports = class HueController {
 
         this._msgSeqCounter = (this._msgSeqCounter + 1) % 256; 
 
-        return Buffer.from(tempBuffer);
+        return await Buffer.from(tempBuffer);
 
     }
 

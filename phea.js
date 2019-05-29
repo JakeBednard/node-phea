@@ -1,6 +1,6 @@
 "use strict";
 
-const PheaEngine = require('./src/phea-engine');
+import PheaEngine from './src/phea-engine';
 
 const DEFAULT_PORT = 2100;
 const DEFAULT_FPS = 50;
@@ -189,4 +189,4 @@ class Phea {
 
 }
 
-module.exports = Phea;
+export default Phea;
