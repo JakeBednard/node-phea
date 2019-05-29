@@ -24,7 +24,14 @@
   },
   "homepage": "https://github.com/JakeBednard/node-phea#readme",
   "dependencies": {
+    "@log4js-node/log4js-api": "github:log4js-node/log4js-api",
     "node-dtls-client": "^0.5.6",
-    "request": "^2.88.0"
+    "performance-node": "^0.2.0",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "log4js": "^4.3.1"
   }
 }

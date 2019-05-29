@@ -2,37 +2,51 @@
 
 const util = require('util');
 const Buffer = require('buffer').Buffer;
-const Request = require('request');
+const log4js = require('@log4js-node/log4js-api');
 const dtls = require("node-dtls-client").dtls;
+const RequestPromise = require('request-promise-native');
 
 
- class HueController {
+const logger = log4js.getLogger('PHEA');
+
+
+module.exports = class HueController {
 
     constructor(lights, options) {
-        this._lights = lights;
         this._opts = options;
+        this._lights = lights;
         this._socket = null;
-        this._running = false;
         this._msgSeqCounter = 0;
     }
 
     async start() {
-        await this._openHueBridgeDtlsSocket();
+        
+        try {                
+            await this._setHueBridgeDtlsState(true);
+            this._socket = await this._openHueBridgeDtlsSocket();
+        } catch (error) {
+            logger.error('DTLS - Phea failed to establish a connection with the Hue Bridge.');
+            throw new Error('PHEA - DTLS - Phea failed to establish a connection with the Hue Bridge.');
+        }
+
+        return true;
+
     }
 
     async stop() {
-        await this._closeHueBridgeDtlsSocket();
+        await this._socket.close();
+        await this._setHueBridgeDtlsState(false);
     }
 
     async render(rgb) {
-        const message = this._generateMessage(rgb);
+        const message = await this._generateMessage(rgb);
         await this._socket.send(message);
     }
 
     async _openHueBridgeDtlsSocket() {
 
         let config = {
-            type: 'udp4',
+            type: "udp4",
             port: this._opts.port,
             address: this._opts.ip,
             psk: {},
@@ -41,68 +55,83 @@ const dtls = require("node-dtls-client").dtls;
         }
 
         config.psk[this._opts.username] = Buffer.from(this._opts.psk, 'hex');
+    
+        let socketCreated = false;
 
-        await this._setHueBridgeDtlsState(true);
+        let socket = await dtls.createSocket(config)
+        .on("connected", () => {
+            logger.info("DTLS: Socket Established.");
+            socketCreated = true;
+        })
+        .on("error", e => {
+            logger.error("DTLS: Socket Setup Failed:", e);
+        })
+        .on("message", msg => {
+            logger.info("DTLS: Message Received:", msg);
+        })
+        .on("close", () => {
+            logger.info("DTLS: Socket Closed.");
+        });
 
-        let maxAttempts = this._opts.maxSocketConnectAttempts;
-        while(!this._running && maxAttempts-- > 0) {
+        // Await the max timeout of socket creation before
+        // checking to see if the socket was successfully
+        // created. This is a workaround for no promise avail.
 
-            this._socket = await dtls.createSocket(config)
-            .on("connected", () => {
-                console.log("PHEA [DTLS]: Socket Established");
-                this._running = true;
-            })
-            .on("error", e => {
-                console.log("PHEA [DTLS]: Socket Failed: Retrying...");
-            })
-            .on("message", msg => {
-                // I don't expect to receive messages, but if aliens:
-                console.log("PHEA [DTLS]: Socket Received: ", msg);
-            })
-            .on("close", e => {
-                this._socket = null;
-                this._running = false;
-                console.log("PHEA [DTLS]: Socket Closed");
-            });
+        await new Promise(
+            (resolve) => setTimeout(resolve, this._opts.socketTimeout)
+        );
 
-            await this._sleep(this._opts.socketTimeout + 5);
-
+        if (!socketCreated) {
+            logger.error('DTLS: Socket could not be created.');
+            throw new Error('PHEA - DTLS: Socket could not be created.');
         }
 
-        if (maxAttempts < 0) {
-            throw new Error("PHEA [DTLS]: Could not establish socket with Hue Bridge.");
-        } 
+        return socket;
 
-    }
-
-    async _closeHueBridgeDtlsSocket() {
-        await this._socket.close();
-        await this._setHueBridgeDtlsState(false);
     }
 
     async _setHueBridgeDtlsState(state=true) {
 
-        const request_options = {
-            url: util.format('http://%s/api/%s/groups/%s', this._opts.ip, this._opts.username, this._opts.group),
+        const setStateQuery = {
             method: 'PUT',
+            uri: util.format(
+                'http://%s/api/%s/groups/%s', 
+                this._opts.ip, this._opts.username, this._opts.group
+            ),
             json: true,
             body: {'stream': {'active': state}}
-        };
+        }
 
-        await Request.put(request_options, function(error, response, body) {
-            if (body[0].success == null) {
-                throw new Error("PHEA [DTLS]: Could not access Hue bridge.");
-            }
-            else {
-                console.log("PHEA [DTLS]: Hue bridge DTLS enabled: " + state);
-            } 
-        });
+        const responseKey = '/groups/' + this._opts.group + '/stream/active';
 
-        await this._sleep(100); // Allow bridge to stablize Dtls state before proceeding.
+        try {
+
+            const response = await RequestPromise(setStateQuery);
+            const dtlsState = response[0]['success'][responseKey];
+            
+            if (state != dtlsState) { throw new Error(); }
+            
+            logger.info('DTLS: Set Hue Bridge DTLS enabled state:', state);
+
+        } catch (error) {
+
+            logger.error(
+                'DTLS: Set Hue Bridge DTLS state failed. State could not' +
+                'be set to:', state
+            );
+
+            throw new Error(
+                'PHEA - DTLS: Set Hue Bridge DTLS state failed. State could not' + 
+                'be set to: ' + state
+            );
+
+        }
+
+        return true;
 
     }
 
-   _generateMessage(rgb) {
+   async _generateMessage(rgb) {
 
         // Init temp array with 'HueStream' as bytes for protocol type definition
         const tempBuffer = [0x48, 0x75, 0x65, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d];
@@ -133,10 +162,4 @@ const dtls = require("node-dtls-client").dtls;
 
     }
 
-    _sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
 }
-
-module.exports = HueController;
