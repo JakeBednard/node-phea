@@ -1,6 +1,7 @@
 "use strict";
 
 const HueController = require("./hue-controller");
+const HueApi = require("./hue-api-controller");
 const Light = require("./light");
 const Texture = require("./textures/texture");
 
@@ -58,6 +59,15 @@ class PheaEngine {
         });
         await this._textures.forEach(texture => texture.step());
         return rgb;
+    }
+
+    async registration() {
+        const credentials = await HueApi.registration(this._opts.ip);
+        return credentials;
+    }
+
+    async getGroup(groupId) {
+        return await HueApi.getGroup(this._opts.ip, this._opts.username, groupId);
     }
 
 }

@@ -1,15 +1,21 @@
 "use strict";
 
-import PheaEngine from './src/phea-engine';
+const os = require('os');
+const fs = require('fs');
+const path = require('path');
+const PheaEngine = require("./src/phea-engine");
+const log4js = require('@log4js-node/log4js-api');
+
+const logger = log4js.getLogger('PHEA');
 
 const DEFAULT_PORT = 2100;
 const DEFAULT_FPS = 50;
 const DEFAULT_MIN_FPS = 10;
 const DEFAULT_MAX_FPS = 120;
 const DEFAULT_MAX_SOCKET_CONNECT_ATTEMPTS = 5;
-const DEFAULT_SOCKET_TIMEOUT_MS = 500;
+const DEFAULT_SOCKET_TIMEOUT_MS = 100;
 
-class Phea {
+module.exports = class Phea {
 
     constructor(options) {
         this._opts = this._checkInstanceOptions(options);
@@ -17,7 +23,25 @@ class Phea {
     }
 
     async start() {
+
+        if (!this._opts.username || !this._opts.psk) {
+
+            let credentialsLoaded = await this._loadCredentials();
+            if (!credentialsLoaded) { 
+
+                let registered = await this._registration();
+                if (!registered) {
+                    throw new Error('Phea: Credentials Error');
+                }
+
+            }
+
+        }
+
+        this._pheaEngine = new PheaEngine(this._opts);
+
         await this._pheaEngine.start();
+
     }
 
     async stop() {
@@ -43,7 +67,7 @@ class Phea {
         await Promise.all(transitions);
         
         if (block) {
-            await this._sleep(tweenTime);
+            await new Promise(resolve => setTimeout(resolve, tweenTime));
         }
 
     }
@@ -56,6 +80,56 @@ class Phea {
 
         await this._pheaEngine.texture(lights, type, duration, depth);
 
+    }
+
+    async _loadCredentials() {
+
+        let credentialsRaw, credentials;
+
+        try {
+            credentialsRaw = await fs.readFileSync(this._opts.credentialsPath);
+        } catch (error) {
+            return false;
+        }
+
+        credentials = await JSON.parse(credentialsRaw);
+
+        if (!credentials.username || !credentials.psk) {
+            return false;
+        }
+        else {
+            this._opts.username = credentials.username;
+            this._opts.psk = credentials.psk;
+        }
+        
+        return true;
+
+    }
+
+    async _registration() {
+
+        try {
+        
+            let credentials = await this._pheaEngine.registration(this.ipAddress);
+            let credentialsSerialized = await JSON.stringify(credentials);
+
+            await fs.writeFile(this._opts.credentialsPath,  credentialsSerialized, (err) => {
+                if (err) throw err;
+            });
+
+            this._opts.username = credentials.username;
+            this._opts.psk = credentials.psk;
+
+            return true;
+
+        } catch (error) {
+            throw (error);
+        }     
+
+    }
+
+    async getGroup(groupId) {
+        return await this._pheaEngine.getGroup(groupId);
     }
 
     _checkTransitionOptions(lights, rgb, tweenTime, block) {
@@ -130,11 +204,11 @@ class Phea {
             opts.port = DEFAULT_PORT;
         }
 
-        if (typeof(opts.username) !== 'string') throw new Error(
+        if (opts.username && typeof(opts.username) !== 'string') throw new Error(
             "PHEA [Configuration]: 'username' type invalid or unspecified. Must be string."
         );
 
-        if (typeof(opts.psk) !== 'string') throw new Error(
+        if (opts.psk && typeof(opts.psk) !== 'string') throw new Error(
             "PHEA [Configuration]: 'psk' type invalid or unspecified. Must be string."
         );
 
@@ -153,6 +227,10 @@ class Phea {
         if (opts.numberOfLights < 1 || opts.group > 16) throw new Error(
             "PHEA [Configuration]: 'port' must be between 1 and 16 inclusive."
         );
+
+        if (!opts.credentialsPath) {
+            opts.credentialsPath = path.join(os.homedir(), '.phea-config'); 
+        } 
 
         if (opts.fps) {
             if (typeof(opts.fps) !== 'number') throw new Error(
@@ -177,16 +255,10 @@ class Phea {
             "numberOfLights": opts.numberOfLights,
             "fps": opts.fps,
             "maxSocketConnectAttempts": DEFAULT_MAX_SOCKET_CONNECT_ATTEMPTS,
-            "socketTimeout": DEFAULT_SOCKET_TIMEOUT_MS
+            "socketTimeout": DEFAULT_SOCKET_TIMEOUT_MS,
+            "credentialsPath": opts.credentialsPath
         };
 
     }
 
-    /** Wrapper for async ms sleeping */
-    async _sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
 }
-
-export default Phea;
