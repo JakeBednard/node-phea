@@ -63,11 +63,11 @@ async function registration(ipAddress) {
 
 }
 
-async function getGroup(ipAddress, username, groupId) {
+async function getGroup(groupId, ip, username) {
 
     try {
 
-        let url = util.format('http://%s/api/%s/groups/', ipAddress, username);
+        let url = util.format('http://%s/api/%s/groups/', ip, username);
 
         if (groupId) { url += groupId; }
             

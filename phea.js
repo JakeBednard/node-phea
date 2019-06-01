@@ -4,6 +4,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const PheaEngine = require("./src/phea-engine");
+const HueApi = require("./src/hue-api-controller");
 const log4js = require('@log4js-node/log4js-api');
 
 const logger = log4js.getLogger('PHEA');
@@ -82,6 +83,32 @@ module.exports = class Phea {
 
     }
 
+    async groups(groupId) {
+        
+        let groups = await HueApi.getGroup(groupId, this._opts.ip, this._opts.username);
+
+        let entertainmentGroups = [];
+        
+        for (let id in groups) {
+
+            if (groups[id].type == 'Entertainment') {
+                
+                let group = {
+                    'id': id,
+                    'name': groups[id].name,
+                    'lights': groups[id].lights.map(i => parseInt(i) - 1)
+                }
+
+                entertainmentGroups.push(group);
+            
+            }
+
+        }
+
+        return entertainmentGroups;
+
+    }
+
     async _loadCredentials() {
 
         let credentialsRaw, credentials;
@@ -126,10 +153,6 @@ module.exports = class Phea {
             throw (error);
         }     
 
-    }
-
-    async getGroup(groupId) {
-        return await this._pheaEngine.getGroup(groupId);
     }
 
     _checkTransitionOptions(lights, rgb, tweenTime, block) {
