@@ -1,75 +1,61 @@
 "use strict";
 
-const HueController = require("./hue-controller");
 const HueApi = require("./hue-api-controller");
-const Light = require("./light");
-const Texture = require("./textures/texture");
+const HueDtls = require("./hue-dtls").default;
+const Light = require("./hue-light");
 
 
-class PheaEngine {
+module.export = class PheaEngine {
 
-    constructor(options) {
-        this._opts = options;
+    constructor(ipAddress, entertainmentGroup, username, psk, fps) {
+        this.opts = options;
         this._running = false;
         this._renderLoop = null;
+        this._hue = new HueDtls(this._lights, options);
         this._lights = [];
-        this._textures = [];
-        for(let id=0; id < this._opts.numberOfLights; id++) {
-            this._lights.push(new Light(id, options));
-        }
+    }
 
-        this._hue = new HueController(this._lights, options);
+    async init() {
 
     }
 
     async start() {
-        await this._hue.start();
+        await HueApi.enableEntertainmentMode(true, ipAddress, username, group);
+        this._socket = await HueDtls.socket(ip, username, psk, timeout, port);
         this._running = true;
         this._loop();
+        return true;
     }
 
     async stop() {
         this._running = false;
         clearTimeout(this._renderLoop);
         await this._hue.stop();
+        await this._socket.close();
+        await this._setHueBridgeDtlsState(false);
     }
 
     async transition(lightId, rgb, tweenTime) {
         await this._lights[lightId].transitionColor(rgb, tweenTime);
-    }
-
-    async texture(lights, type, duration, depth) {
-        let newTexture = new Texture[type](duration, depth, this._opts.fps);
-        lights.forEach(lightId => { this._lights[lightId].textures.push(newTexture); });
-        this._textures.push(newTexture);
+        const message = await this._generateMessage(rgb);
+        await this._socket.send(message);
     }
 
     async _loop() {
+
         if (this._running) {
+
             this._renderLoop = setTimeout(() => { this._loop(); }, (1000 / this._opts.fps));
-            let rgb = await this._step();
+            
+            let rgb = [];
+            await this._lights.forEach((light) => {
+                rgb.push(light.gen.next().value);
+            });
+            
             await this._hue.render(rgb);
+
         }
-    }
 
-    async _step() {
-        let rgb = [];
-        await this._lights.forEach((light) => {
-            rgb.push(light.gen.next().value);
-        });
-        await this._textures.forEach(texture => texture.step());
-        return rgb;
-    }
-
-    async registration() {
-        const credentials = await HueApi.registration(this._opts.ip);
-        return credentials;
-    }
-
-    async getGroup(groupId) {
-        return await HueApi.getGroup(this._opts.ip, this._opts.username, groupId);
     }
 
 }
-
-module.exports = PheaEngine;
