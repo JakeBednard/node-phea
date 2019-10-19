@@ -32,7 +32,7 @@ export class HueBridge {
         }
 
         group = await HueHttp.getGroup(this.opts.address, this.opts.username, groupId);
-
+        
         return group;
 
     }
