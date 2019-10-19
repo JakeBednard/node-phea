@@ -1,8 +1,9 @@
 {
   "name": "phea",
-  "version": "0.7.9",
+  "version": "1.0.0",
   "description": "An unoffcial Phillips Hue Entertainment API library for Node.js.",
-  "main": "phea.js",
+  "main": "./build/phea.js",
+  "types": "./build/phea.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,7 +31,9 @@
     "request-promise-native": "^1.0.7"
   },
   "devDependencies": {
+    "@types/node": "^12.7.8",
     "eslint": "^5.16.0",
-    "log4js": "^4.3.1"
+    "log4js": "^4.3.1",
+    "typescript": "^3.6.3"
   }
 }

@@ -60,5 +60,8 @@ typings/
 # next.js build output
 .next
 
-#phea config
+#phea local testing
 index.js
+index.*.js
+
+.vscode
