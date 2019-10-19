@@ -35,8 +35,6 @@ var HueDtls;
                 throw err;
             })
                 .on("close", () => {
-                let msg = new Error("PHEA - DTLS: Socket Closed");
-                throw msg;
             });
             yield new Promise((resolve) => setTimeout(resolve, 500));
             if (socket == null) {
