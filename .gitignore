@@ -63,3 +63,5 @@ typings/
 #phea local testing
 index.js
 index.*.js
+
+.vscode

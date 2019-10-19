@@ -1,170 +1,265 @@
 # Node Phea
 
-An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/develop/hue-entertainment/) library for Node.js. The goal of this library is to encapsulate the Hue Entertainment API while leaving a developer to use a simple color API to control color state... More documentation coming soon, but this is currently working if you already have an entertainment group, username, and psk setup. 
+An unoffcial [Phillips Hue Entertainment API](https://developers.meethue.com/develop/hue-entertainment/) 
+Typescript library for Node.js. This package aims to implement the core API functionaility 
+of the Entertainment API, while leaving feature implementations to downstream packages. This package
+implements a simple RGB-transitition API that is similar to comparable non-Entertainment API packages. 
+I've tested with both Linux and Windows and have found the package to be stable. I'm still hammering
+out edge-cases and some of the error handling routines, as well as growing with Typescript, so expect
+to see some wild code until I have time to test and play with things. As far as support, this is going
+to be best effort around real-life. Feel free to pop in an issue or shoot a pull request.
 
-##### Current Version: 0.7.9
+
+##### Current Version: 1.0.0
+
 
 #### Features:
 - DTLS Communication Setup + Messaging for Phillips Hue Bridge Entertainment API.
+- HTTP access to standard Hue API for methods related to Entertainment API functionality (discovery, registration, groups).
+- Starting with verison 1.0.0, library is aiming to be Typescript first.
 - Multi-light capabilities to tweek/tween lights individually, or all at once.
-- Easy to use (3-command) API, while strict, allows the Hue Entertainment API to be abstracted away.
-- Performance so far seems pretty good at 50Hz. There's room for improvement, but I want to hold off optimization until >1.0.0.
-- Total computation time needed for 10-lights per frame is <0.1ms (~60 microseconds).
+- Tunable messageing and frame rates to tweak for different environments.
 
-This is still a work-in-progress. That being said, the front facing API will likely not change, so it's now currently
-safe to develop around Phea.
 
 #### To-Do(s):
-- Reduce reliance on async methods.
-- Proper Error Handling.
-- Guide or library for setting up Hue Entertainment Secrets + Groups.
+- Add featuring for creating Hue Entertainment Groups. Currently needs to be setup through Hue app.
+- Find a nice way to peacefully end the DTLS socket without throwing. For now, catch it.
+- Figure out how to Node/TS testing. Definitely need coverage for user facing API.
+- The fancy npm build stuff.
+- Continue the full conversion and improvement of library to Typescript.
+- Improve Error Handling.
 
-## Installation:
+## Getting Started:
+
+### Installation & Import:
 ```
 npm install phea
 ```
-
-## Basic Example:
 ```javascript
 const Phea = require('phea');
-
-let running = true;
-process.on("SIGINT", function () {
-    // Stop example with ctrl+c
-    console.log('SIGINT Detected. Shutting down...');
-    running = false;
-});
-
-async function run() {
-
-    let config = {
-        "ip": "192.168.1.10",
-        "port": 2100,
-        "username": "",
-        "psk": "",
-        "group": 1,
-        "numberOfLights": 1,
-        "fps": 50
-    }
-
-    let phea = new Phea(config);
-    let rgb = [0,0,0];
-    let tweenTime = 1000;
-    
-    await phea.start();
-
-    phea.texture(lights=[], type='sine', duration=2000, depth=40);
-
-    while(running) {
-    
-        rgb[0] = (rgb[0] + 85) % 256;
-        rgb[1] = (rgb[1] + 170) % 256;
-        rgb[2] = (rgb[2] + 255) % 256;
-
-        await phea.transition(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
-    
-    }
-
-    phea.stop();
-
-}
-
-run();
 ```
 
-## API
+### Discovering Hue Bridges on your network:
+```javascript
+let bridges = Phea.discover();
+console.log(bridges);
+```
+```javascript
+[
+  {
+    name: undefined,
+    id: 'ABCDEF0123456789',
+    ip: '192.168.1.152',
+    mac: undefined
+  }
+]
+```
 
-#### Phea(options)
-The creation of this object sets up the control ecosystem for Phea. The main parts of this ecosystem are the Hue Bridge
+### Hue Bridge HTTP/DTLS API key registration:
+```javascript
+// Press Hue Bridge Link Button Immediately before 
+// running Phea.registration(ipAddress: string)
+let credentials = Phea.register("192.168.1.152");
+console.log(credentials);
+```
+```javascript
+{
+  ...
+  "username": "_YOUR_HUE_BRIDGE_REGISTRATION_USERNAME_",
+  "psk": "_YOUR_HUE_BRIDGE_REGISTRATION_PSK_",
+  ...
+}
+```
+
+### Connecting to the Hue Bridge API:
+```javascript
+let options = {
+    "address": "192.168.1.152",
+    "username": "_YOUR_HUE_BRIDGE_REGISTRATION_USERNAME_",
+    "psk": "_YOUR_HUE_BRIDGE_REGISTRATION_PSK_"
+}
+
+let bridge = Phea.bridge(options);
+```
+
+### Fetch Hue Bridge Groups:
+```javascript
+let groups = await bridge.getGroup(0); // 0 will fetch all groups.
+console.log(groups);
+```
+```javascript
+[  
+  // "1" is the id for the light group. You must use group w/ type: 'Entertainment',
+  "1": { 
+    name: 'Entertainment area 1',
+    lights: [ '1', '2', ... ],
+    sensors: [],
+    type: 'Entertainment',
+    state: { all_on: true, any_on: true },
+    recycle: false,
+    class: 'TV',
+    stream: {
+      proxymode: 'auto',
+      proxynode: '/lights/1',
+      active: false,
+      owner: null
+    },
+    locations: {
+      '1': [ -0.5, -0.5, 0 ],
+      '2': [ 0.2, 0.2, -0.3 ],
+      ...
+    },
+    action: {
+      on: true,
+      bri: 254,
+      hue: 47104,
+      sat: 254,
+      effect: 'none',
+      xy: [ 0.1532, 0.0475 ],
+      ct: 153,
+      alert: 'select',
+      colormode: 'xy'
+    }
+  }, 
+  ...
+]
+```
+
+### Starting/Stopping PHEA DTLS Light Control:
+```javascript
+bridge.start(entertainmentGroupId);
+
+// ...Light Control Stuff
+
+bridge.stop();
+```
+
+### Light Control:
+```javascript
+let lightId = [0];         // 0 is the Default Group for setting all lights in group.
+let rgb = [255, 255, 255]; // RGB int array [r, g, b]
+let transitionTime = 1000; // Milliseconds
+
+bridge.transition(lightId, rgb, transitionTime);
+```
+
+### Full Examples
+*Please see the examples directory for full examples and demonstrations.*
+
+## API Documentation
+
+### Phea:
+
+#### Phea.discover(): Promise<`any`>
+Returns an array containing details for all Phillips Hue Bridge's found on
+network using Hue Public API (NUPnP). If HTTP traffic isn't allowed to egress your
+network to the web, this isn't going to return anything.
+
+#### Phea.register(ipAddress: string): Promise<`any`>
+##### Make sure to press the Hue Bridge Link button before runnning this method.
+Returns an unqiue username and psk from the Hue Bridge. These credentials are used
+to access the bridge's HTTP and DTLS APIs.
+
+#### Phea.bridge(options: Options): Promise<`HueBridge`>
+Creates and returns a HueBridge object that will be used for interacting with
+the HueBridge. The HueBridge object is essentially the controller for fetching from the
+HueAPI as well as controls the PheaEngine object to orchestrate light control.
+
+#### Phea Bridge Options (User Config Dictionary):
+```Typescript
+export interface Options {
+  address: string;
+  username: string;
+  psk: string;
+  dtlsUpdatesPerSecond: number;
+  colorUpdatesPerSecond: number;
+  dtlsPort: number;
+  dtlsTimeoutMs: number;
+}
+```
+The creation of this object sets up the bridge control ecosystem for Phea. The main parts of this ecosystem are the Hue Bridge
 controller and the lights which maintain transition math. The core is called the Phea Engine where we strap all the parts 
-together and put it behind an API. On top of that API, we added another API for up-front input checking for inputs that are
-going to cause failures. Here, I have elected to throw errors, so bugs can be worked out sooner than later.
+together. The Phea Engine is then interacted with using the bridge controller object.
 
-The following options must be provided in the instance configuration dictionary except when marked with a default value: 
+Params:
 
-##### ip (str):
-The IPv4 address of the Hue Bride that will be serving the Entertainment API.
+##### address (string) [required]:
+The IPv4 address or host address of the Hue Bridge that will be serving the Entertainment API.
 
-##### port (int) [default=2100]:
-The Hue Bridge port listening for commands. Default is for the Hue Bridge is 2100.
-
-##### username (str):
-The 40-character string generated by the Hue Bridge server. You'll typically have to set this up manually through 
+##### username (string) [required]:
+Required: The 40-character string generated by the Hue Bridge server. You'll typically have to set this up manually through 
 the Bridge's REST API. In the future, the goal is the automate this generation in to the app itself. 
 
-##### psk (str):
-The 32-character hex string generated by the Hue Bridge server. You'll typically have to set this up manually through 
+##### psk (string) [required]:
+Required: The 32-character hex string generated by the Hue Bridge server. You'll typically have to set this up manually through 
 the Bridge's REST API. In the future, the goal is the automate this generation in to the app itself. 
 
-##### group (int):
-This is the entertainment group that you will be controlling fron the Phea API. This group can be made within
-the Philips Hue app. I'm considering building this into the API.
+##### colorUpdatesPerSecond (int) [default=25]:
+This value controls the update rate of light color transition controller. By default, this value is set to
+25, which is the recomended max rate by Philips (dtlsUpdateRate/2). Keep in mind, the lights themselves are limited to about 12.5fps in
+real life, so that'll be your ultimate cap of light performance. 
 
-##### numberOfLights (int):
-The number of lights within the entertainment group provided. The immediate goal is to automate this away. The API should
-tell us how many lights are in the group.
-
-##### fps (int) [default=50]:
+##### dtlsUpdatesPerSecond (int) [default=50]:
 This value controls the update rate of color change events to the Entertainment API. By default, this value is set to
 50, which is the recomended max rate by Philips. Keep in mind, the lights themselves are limited to about 12.5fps in
 real life, so that'll be your ultimate cap of light performance. The upside to this limit is that gives you somewhere in 
-between 20-80ms to generate your next color. Typically, that should be pretty good times compute wise. At some point, we'll 
-start looking to optimize out the library.
+between 20-80ms to generate your next color. 
 
-#### Phea.start()
-This opens the DTLS socket with the Hue Bridge, then kicks the rendering loop into action. While the engine is
-hidden behind the API, the engine itself is always throwing renders to the Bridge every (1000/fps) milliseconds. 
+##### dtlsPort (int) [default=2100]:
+The Hue Bridge port listening for commands. Default is for the Hue Bridge is 2100.
+
+##### dtlsTimeoutMs (int) [default=100]:
+Timeout in milliseconds to wait when connecting to the Hue Brdige DTLS port. Currently
+this value will always be used on connection creation to delay for dtls socket creation
+race condition (TODO: Fix race condition).
+
+
+### HueBridge:
+
+#### Bridge.start(groupId: string | int) : promise<`void`>
+This opens the DTLS socket with the Hue Bridge, then kicks the rendering loop into action. groupId is Hue Entertainment
+group API that you wish to control as int or string. While the engine is
+hidden behind the API, the engine itself is always throwing renders to the Bridge every (1000/dtlsUpdatesPerSecond) milliseconds. 
 This is done to keep the light completely in-sync as well as maintain an open connection with the Bridge. This returns
 a promise waiting for the establishment of the socket to the Bridge. You should wait for this to happen before any
 other communication happens.
 
-#### Phea.stop()
+#### Bridge.stop() : promise<`void`>
 Shut it all down, exit the render loops, release the socket. Sometime a frame can hang and it'll take a second or two to 
 fully return. I'm looking into this, but its a minor inconvienence.
 
-#### Phea.transition(lights=[], rgb=[0,0,0], tweenTime=0, block=false)
-Phea color changes are facilated through the transition method. Every color change, on every light, consist of a timeout 
-loop to handle the math of updating and rendering colors to its respective light. These timeout loops can be interrupted and
-replaced at any point, even immediately. This allows transitions to be set in real-time to control the lights. Keep in mind, even if tween time is set to 0, you'll still ultimately be limited by the Hue Bridge 12.5hz update rate.
+#### Bridge.transition(lightId: (string | int)[], rgb: int[], transitionTime: int) : promise<`void`>
+Phea color changes are facilated through the transition method. Every color change, on every light, consist of a interval 
+loop to handle the math of updating and rendering colors for each respective light. These interval loops can be interrupted and
+replaced at any point, even immediately. This allows transitions to be set in real-time to control the lights. Keep in mind, 
+even if tween time is set to 0, you'll still ultimately be limited by the dtlsTimeoutMs option ~(1000/dtlsTimeoutMs) milliseconds.
 
-##### lights=[]:
-The light channels to send this color transition to. The default ([]) selects all of the lights (options.numberofLights).
+##### lightId: (string | int)[]:
+The light channels to send this color transition to. The value 0 selects all of the lights (options.numberofLights).
 One distinction with this API is that light channel input numbers, numbering starts at 0, where as, the Hue Bridge starts
 numbering at 1. So when placing your lights channels, recall n-1, to place the value. 
 
-##### rgb=[0,0,0]
+##### rgb: int[] = [0,0,0]:
 This is the color the you want the transition the selected lights to. This is a 3-value array where each value is a 
 uint8 representing the red, green, blue color bytes respectively. This color will be tweened to over the duration of
 tweenTime.
 
-##### tweenTime=0
+##### transitionTime: int = 0:
 This is the amount of time in milliseconds that the transition will take to tween from the existing color to
 the new color. Default is 0, which means that the color change will occur on the next update to the Hue Bridge.
 I don't see any performance concerns yet, but I'm trying to start finding ways to do profiling. Though, with an update
 rate at 50fps, you're still looking at 15-20ms to render you're next color setting. That it typlically ample, and if not,
 the framerate can be lowered to accomodate.
 
-##### block=false
-If you're calling the transition in a synchronous piece of code, set block to true, and the transition will
-hold execution for the duration of the light transition. 
+#### Bridge.getGroup(groupId: string | int) : promise<`any`>
+Fetches group information from Hue HTTP API. groupId can be int or string. If 0 is provided, all groups will be returned.
+Note, when all groups are fetched, an array will be returned.
 
-#### Phea.texture(lights=[], type, duration, depth)
+#### Bridge.setGroup(groupId: string | int, groupSettings: any) : promise<`void`>
+-NOT IMPLEMENTED-
 
-##### lights=[]:
-The light channels to send this color transition to. The default ([]) selects all of the lights (options.numberofLights).
-One distinction with this API is that light channel input numbers, numbering starts at 0, where as, the Hue Bridge starts
-numbering at 1. So when placing your lights channels, recall n-1, to place the value. 
-
-##### type: 
-Either 'sine' or 'square':
-- 'sine' is a sin wave that oscilates at 1/duration hz with an amplitude of depth.
-- 'square' is a square wave that oscilates at 1/duration hz with an amplitude of depth.
-
-##### duration:
-Integer cycle length for oscillator in milliseconds.
-
-##### depth:
-The amount of pixel color shift that will be oscillated by the texture. Value is integer [1,255].
+#### Bridge.getLight(groupId: string | int) : promise<`any`>
+-NOT IMPLEMENTED-
 
 ## Photosensitive Seizure Warning
 ###### (via Phillips Hue Documentation)
