@@ -98,28 +98,9 @@ console.log(groups);
     state: { all_on: true, any_on: true },
     recycle: false,
     class: 'TV',
-    stream: {
-      proxymode: 'auto',
-      proxynode: '/lights/1',
-      active: false,
-      owner: null
-    },
-    locations: {
-      '1': [ -0.5, -0.5, 0 ],
-      '2': [ 0.2, 0.2, -0.3 ],
-      ...
-    },
-    action: {
-      on: true,
-      bri: 254,
-      hue: 47104,
-      sat: 254,
-      effect: 'none',
-      xy: [ 0.1532, 0.0475 ],
-      ct: 153,
-      alert: 'select',
-      colormode: 'xy'
-    }
+    stream: {...},
+    locations: {...}
+    action: {...}
   }, 
   ...
 ]
