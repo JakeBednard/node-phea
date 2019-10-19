@@ -1,6 +1,6 @@
 {
   "name": "phea",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An unoffcial Phillips Hue Entertainment API library for Node.js.",
   "main": "./build/phea.js",
   "types": "./build/phea.d.ts",
