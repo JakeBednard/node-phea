@@ -44,7 +44,7 @@ async function cyclePatternTransition() {
         
         await new Promise(resolve => setTimeout(resolve, transitionTime));
 
-        i += 1;
+        i++;
 
     }
 

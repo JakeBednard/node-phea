@@ -10,7 +10,7 @@ to see some wild code until I have time to test and play with things. As far as 
 to be best effort around real-life. Feel free to pop in an issue or shoot a pull request.
 
 
-##### Current Version: 1.0.2
+##### Current Version: 1.0.3
 
 
 #### Features:
@@ -177,12 +177,12 @@ the Bridge's REST API. In the future, the goal is the automate this generation i
 
 ##### colorUpdatesPerSecond (int) [default=25]:
 This value controls the update rate of light color transition controller. By default, this value is set to
-25, which is the recomended max rate by Philips (dtlsUpdateRate/2). Keep in mind, the lights themselves are limited to about 12.5fps in
+60, which is the recomended max rate by Philips (dtlsUpdateRate/2). Keep in mind, the lights themselves are limited to about 12.5fps in
 real life, so that'll be your ultimate cap of light performance. 
 
 ##### dtlsUpdatesPerSecond (int) [default=50]:
 This value controls the update rate of color change events to the Entertainment API. By default, this value is set to
-50, which is the recomended max rate by Philips. Keep in mind, the lights themselves are limited to about 12.5fps in
+60, which is the recomended max rate by Philips. Keep in mind, the lights themselves are limited to about 12.5fps in
 real life, so that'll be your ultimate cap of light performance. The upside to this limit is that gives you somewhere in 
 between 20-80ms to generate your next color. 
 

@@ -1,11 +1,7 @@
-import { getLogger } from '@log4js-node/log4js-api';
 import { Options } from "./phea-options"
 import { HueBridge } from "./hue-bridge";
 import { HueHttp } from "./hue-http";
 import { Config } from "./phea-config";
-
-
-const logger = getLogger('PHEA');
 
 
 export async function discover(): Promise<any> {

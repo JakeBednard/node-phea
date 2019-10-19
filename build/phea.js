@@ -9,11 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const log4js_api_1 = require("@log4js-node/log4js-api");
 const hue_bridge_1 = require("./hue-bridge");
 const hue_http_1 = require("./hue-http");
 const phea_config_1 = require("./phea-config");
-const logger = log4js_api_1.getLogger('PHEA');
 function discover() {
     return __awaiter(this, void 0, void 0, function* () {
         let bridges = yield hue_http_1.HueHttp.discoverBridge();

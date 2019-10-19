@@ -1,5 +1,3 @@
-"use strict";
-
 import { Options } from "./phea-options";
 import { Socket } from "dgram";
 import { HueHttp } from "./hue-http";

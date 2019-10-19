@@ -10,9 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const util = require('util');
-const log4js = require('@log4js-node/log4js-api');
 const RequestPromise = require('request-promise-native');
-const logger = log4js.getLogger('PHEA');
 var HueHttp;
 (function (HueHttp) {
     function discoverBridge() {
@@ -40,7 +38,6 @@ var HueHttp;
                     default:
                         break;
                 }
-                logger.error(error);
                 throw error;
             }
         });

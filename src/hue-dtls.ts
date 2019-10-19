@@ -1,10 +1,5 @@
-"use strict";
-
 import { Buffer } from 'buffer';
 import { dtls } from "node-dtls-client";
-import { getLogger } from '@log4js-node/log4js-api';
-
-const logger = getLogger('PHEA');
 
 
 export namespace HueDtls {
@@ -25,7 +20,7 @@ export namespace HueDtls {
         // @ts-ignore
         socket = await dtls.createSocket(config)
         .on("message", (msg: string) => { 
-            logger.info("DTLS: Message received:", msg) 
+
         })
         .on("error", (e: any) => { 
             let err = new Error(e);
@@ -49,7 +44,6 @@ export namespace HueDtls {
         );
 
         if (socket == null) {
-            logger.error('DTLS: Socket could not be created.');
             let err = new Error('PHEA - DTLS: Socket could not be created.');
             //err.code = 'PHEA.HUE_DTLS_CONTROLLER.SOCKET_ERROR'
         }

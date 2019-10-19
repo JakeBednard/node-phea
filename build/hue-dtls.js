@@ -11,8 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const buffer_1 = require("buffer");
 const node_dtls_client_1 = require("node-dtls-client");
-const log4js_api_1 = require("@log4js-node/log4js-api");
-const logger = log4js_api_1.getLogger('PHEA');
 var HueDtls;
 (function (HueDtls) {
     function createSocket(address, username, psk, timeout, port) {
@@ -28,7 +26,6 @@ var HueDtls;
             };
             socket = yield node_dtls_client_1.dtls.createSocket(config)
                 .on("message", (msg) => {
-                logger.info("DTLS: Message received:", msg);
             })
                 .on("error", (e) => {
                 let err = new Error(e);
@@ -38,7 +35,6 @@ var HueDtls;
             });
             yield new Promise((resolve) => setTimeout(resolve, 500));
             if (socket == null) {
-                logger.error('DTLS: Socket could not be created.');
                 let err = new Error('PHEA - DTLS: Socket could not be created.');
             }
             return socket;

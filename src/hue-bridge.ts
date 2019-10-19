@@ -1,5 +1,3 @@
-"use strict";
-
 import { HueHttp } from "./hue-http";
 import { PheaEngine } from "./phea-engine"; 
 import { Options } from "./phea-options";

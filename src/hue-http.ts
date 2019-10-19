@@ -1,11 +1,5 @@
-import { stringify } from "querystring";
-
 const util = require('util');
-const log4js = require('@log4js-node/log4js-api');
 const RequestPromise = require('request-promise-native');
-
-
-const logger = log4js.getLogger('PHEA');
 
 
 export namespace HueHttp {
@@ -44,8 +38,6 @@ export namespace HueHttp {
                     break;
             }
         
-
-            logger.error(error);
             throw error;
 
         }
