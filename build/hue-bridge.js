@@ -58,33 +58,35 @@ class HueBridge {
         });
     }
     transition(lightId, rgb, tweenTime = 0) {
-        if (!Array.isArray(lightId)) {
-            lightId = [lightId];
-        }
-        rgb.forEach((color) => {
-            if (!Number.isInteger(color)) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!Array.isArray(lightId)) {
+                lightId = [lightId];
+            }
+            rgb.forEach((color) => {
+                if (!Number.isInteger(color)) {
+                    throw new Error("rgb[] must be array of int[0,255] inclusive.");
+                }
+                else if (color < 0 || color > 255) {
+                    throw new Error("rgb[] must be array of int[0,255] inclusive.");
+                }
+            });
+            if (!Number.isInteger(tweenTime)) {
+                throw new Error("tweenTime must be postive integer or 0.");
+            }
+            else if (tweenTime < 0) {
                 throw new Error("rgb[] must be array of int[0,255] inclusive.");
             }
-            else if (color < 0 || color > 255) {
-                throw new Error("rgb[] must be array of int[0,255] inclusive.");
-            }
-        });
-        if (!Number.isInteger(tweenTime)) {
-            throw new Error("tweenTime must be postive integer or 0.");
-        }
-        else if (tweenTime < 0) {
-            throw new Error("rgb[] must be array of int[0,255] inclusive.");
-        }
-        lightId.forEach((id) => {
-            if (!Number.isInteger(Number(id))) {
-                throw new Error("lightId | lightId[] must be int[0,31] inclusive as type string.");
-            }
-            else if (Number(id) < 0 || Number(id) > 16) {
-                throw new Error("lightId | lightId[] must be int[0,31] inclusive as type string.");
-            }
-            if (this.pheaEngine != null && this.pheaEngine.running) {
-                this.pheaEngine.transition(id, rgb, tweenTime);
-            }
+            lightId.forEach((id) => {
+                if (!Number.isInteger(Number(id))) {
+                    throw new Error("lightId | lightId[] must be int[0,31] inclusive as type string.");
+                }
+                else if (Number(id) < 0 || Number(id) > 16) {
+                    throw new Error("lightId | lightId[] must be int[0,31] inclusive as type string.");
+                }
+                if (this.pheaEngine != null && this.pheaEngine.running) {
+                    this.pheaEngine.transition(id, rgb, tweenTime);
+                }
+            });
         });
     }
 }

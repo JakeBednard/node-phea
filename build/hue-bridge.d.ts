@@ -8,5 +8,5 @@ export declare class HueBridge {
     getGroup(groupId: string | number): Promise<any>;
     start(groupId: string): Promise<void>;
     stop(): Promise<void>;
-    transition(lightId: (string | number)[], rgb: number[], tweenTime?: number): void;
+    transition(lightId: (string | number)[], rgb: number[], tweenTime?: number): Promise<void>;
 }

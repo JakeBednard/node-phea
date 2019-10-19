@@ -48,7 +48,16 @@ class PheaEngine {
         this.groupId = "-1";
     }
     transition(lightId, rgb, tweenTime) {
-        this.lights[Number(lightId)].transitionColor(rgb, tweenTime);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (Number(lightId) === 0) {
+                this.lights.forEach((light) => {
+                    light.transitionColor(rgb, tweenTime);
+                });
+            }
+            else {
+                this.lights[Number(lightId) - 1].transitionColor(rgb, tweenTime);
+            }
+        });
     }
     stepColor() {
         if (!this.running)

@@ -1,44 +1,45 @@
 const Phea = require('phea');
 
 let running = true;
-process.on("SIGINT", function () {
+process.on("SIGINT", () => {
     // Stop example with ctrl+c
     console.log('SIGINT Detected. Shutting down...');
     running = false;
 });
 
-async function run() {
+async function basicExample() {
 
-    let config = {
-        "ip": "192.168.1.10",
-        "port": 2100,
-        "username": "",
-        "psk": "",
-        "group": 1,
-        "numberOfLights": 1,
-        "fps": 50
+    let options = {
+        "address": "__YOUR_BRIDGE_ADDRESS__",
+        "username": "__YOUR_USERNAME__",
+        "psk": "__YOUR_PSK__",
     }
 
-    let phea = new Phea(config);
-    let rgb = [0,0,0];
-    let tweenTime = 1000;
-    
-    await phea.start();
+    let groupId = 2;
+    let transitionTime = 1000; // milliseconds
 
-    phea.texture(lights=[], type='sine', duration=2000, depth=40);
+    let bridge = await Phea.bridge(options);    
+    await bridge.start(groupId);
 
     while(running) {
-    
-        rgb[0] = (rgb[0] + 85) % 256;
-        rgb[1] = (rgb[1] + 170) % 256;
-        rgb[2] = (rgb[2] + 255) % 256;
 
-        await phea.transition(lights=[], rgb=rgb, tweenTime=tweenTime, block=true);
-    
+        let color = [
+            // Generate Random RGB Color Array
+            Math.floor(55 + Math.random() * Math.floor(200)),
+            Math.floor(55 + Math.random() * Math.floor(200)),
+            Math.floor(55 + Math.random() * Math.floor(200))
+        ];
+
+        // Set all lights to random color.
+        bridge.transition(0, color, transitionTime);
+        
+        // Sleep until next color update is needed.
+        await new Promise(resolve => setTimeout(resolve, transitionTime));
+
     }
 
-    phea.stop();
+    bridge.stop();
 
 }
 
-run();
+basicExample();

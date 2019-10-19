@@ -69,8 +69,15 @@ export class PheaEngine {
 
     }
 
-    public transition(lightId: string | number, rgb: number[], tweenTime: number) {
-        this.lights[Number(lightId)].transitionColor(rgb, tweenTime);
+    public async transition(lightId: string | number, rgb: number[], tweenTime: number): Promise<void> {
+        if (Number(lightId) === 0) {
+            this.lights.forEach((light) => {
+                light.transitionColor(rgb, tweenTime);
+            });
+        }
+        else {
+            this.lights[Number(lightId)-1].transitionColor(rgb, tweenTime);
+        }
     }
  
     private stepColor() {

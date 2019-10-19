@@ -10,7 +10,7 @@ export declare class PheaEngine {
     constructor(options: Options);
     start(groupIdStr: string): Promise<void>;
     stop(): void;
-    transition(lightId: string | number, rgb: number[], tweenTime: number): void;
+    transition(lightId: string | number, rgb: number[], tweenTime: number): Promise<void>;
     private stepColor;
     private dtlsUpdate;
     private _setupLights;

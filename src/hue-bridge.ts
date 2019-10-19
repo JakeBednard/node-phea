@@ -62,7 +62,7 @@ export class HueBridge {
 
     }
 
-    transition(lightId: (string | number)[], rgb: number[], tweenTime=0): void {
+    async transition(lightId: (string | number)[], rgb: number[], tweenTime=0): Promise<void> {
 
         if (!Array.isArray(lightId)) {
             lightId = [lightId];
