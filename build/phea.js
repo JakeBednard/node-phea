@@ -57,7 +57,8 @@ function configureBridgeOptions(options) {
     if (options.colorUpdatesPerSecond == null) {
         options.colorUpdatesPerSecond = phea_config_1.Config.COLOR_UPDATES_PER_SECOND;
     }
-    else if (typeof (options.colorUpdatesPerSecond) !== 'number' || options.colorUpdatesPerSecond < phea_config_1.Config.COLOR_UPDATES_PER_SECOND_MIN ||
+    else if (typeof (options.colorUpdatesPerSecond) !== 'number' ||
+        options.colorUpdatesPerSecond < phea_config_1.Config.COLOR_UPDATES_PER_SECOND_MIN ||
         options.colorUpdatesPerSecond > phea_config_1.Config.COLOR_UPDATES_PER_SECOND_MAX) {
         throw new Error("PHEA [Configuration]: 'colorUpdatesPerSecond' must be of type int between " +
             phea_config_1.Config.COLOR_UPDATES_PER_SECOND_MIN + " and " + phea_config_1.Config.COLOR_UPDATES_PER_SECOND_MAX + " inclusive.");

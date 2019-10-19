@@ -65,7 +65,8 @@ export function configureBridgeOptions(options: Options): void {
     if (options.colorUpdatesPerSecond == null) {
         options.colorUpdatesPerSecond = Config.COLOR_UPDATES_PER_SECOND;
     }
-    else if (typeof(options.colorUpdatesPerSecond) !== 'number' || options.colorUpdatesPerSecond < Config.COLOR_UPDATES_PER_SECOND_MIN || 
+    else if (typeof(options.colorUpdatesPerSecond) !== 'number' || 
+        options.colorUpdatesPerSecond < Config.COLOR_UPDATES_PER_SECOND_MIN || 
         options.colorUpdatesPerSecond > Config.COLOR_UPDATES_PER_SECOND_MAX) {
         throw new Error(
             "PHEA [Configuration]: 'colorUpdatesPerSecond' must be of type int between " + 
