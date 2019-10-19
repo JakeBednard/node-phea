@@ -4,4 +4,4 @@ tsconfig.json
 src/
 build/**/*.map
 .vs*/
-index.**.js
+index*
