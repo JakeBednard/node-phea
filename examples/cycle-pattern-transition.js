@@ -12,9 +12,7 @@ async function cyclePatternTransition() {
     let options = {
         "address": "__YOUR_BRIDGE_ADDRESS__",
         "username": "__YOUR_USERNAME__",
-        "psk": "__YOUR_PSK__",
-        "dtlsUpdatesPerSecond": 50,
-        "colorUpdatesPerSecond": 60 // Found these FPS settings to work nicely.
+        "psk": "__YOUR_PSK__"
     }
 
     let groupId = 2;
@@ -32,14 +30,15 @@ async function cyclePatternTransition() {
     ]
 
     let bridge = await Phea.bridge(options);
-    let numberOfLights = await bridge.getGroup(groupId).lights.length;
+    let groupInfo = await bridge.getGroup(groupId);
+    let numberOfLights = groupInfo.lights.length;
     
     await bridge.start(groupId);
 
     let i = 0;
     while(running) {
 
-        for(let id=0; i<numberOfLights; i++) {
+        for(let id=0; id<numberOfLights; id++) {
             bridge.transition(id+1, colors[(i+id) % colors.length], transitionTime);
         }
         
