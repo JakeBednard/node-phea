@@ -10,7 +10,7 @@ to see some wild code until I have time to test and play with things. As far as 
 to be best effort around real-life. Feel free to pop in an issue or shoot a pull request.
 
 
-##### Current Version: 1.0.3
+##### Current Version: 1.0.4
 
 
 #### Features:
