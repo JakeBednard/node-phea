@@ -29,7 +29,7 @@ class PheaEngine {
                 throw new Error("Current group selected does not exist or is not a valid Entertainment group.");
             }
             this.groupId = groupIdStr;
-            yield this._setupLights(group.lights.length);
+            yield this._setupLights(group.lights);
             yield hue_http_1.HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
             this.socket = yield hue_dtls_1.HueDtls.createSocket(this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort);
             this.running = true;
@@ -68,20 +68,18 @@ class PheaEngine {
         if (!this.running || this.socket == null) {
             return;
         }
-        let rgb = [];
+        let lights = [];
         this.lights.forEach((light) => {
-            rgb.push(light.rgb);
+            lights.push(light.sampleColor());
         });
-        let msg = hue_dtls_1.HueDtls.createMessage(rgb);
+        let msg = hue_dtls_1.HueDtls.createMessage(lights);
         this.socket.send(msg, this.opts.dtlsPort);
     }
-    _setupLights(numberOfLights) {
+    _setupLights(lightIDs) {
         this.lights = [];
-        if (numberOfLights > 0) {
-            for (let i = 1; i <= numberOfLights; i++) {
-                this.lights.push(new hue_light_1.HueLight(i.toString(), this.opts));
-            }
-        }
+        lightIDs.forEach(lightId => {
+            this.lights.push(new hue_light_1.HueLight(lightId.toString(), this.opts));
+        });
     }
 }
 exports.PheaEngine = PheaEngine;

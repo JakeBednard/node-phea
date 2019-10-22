@@ -33,15 +33,27 @@ var HueDtls;
             })
                 .on("close", () => {
             });
-            yield new Promise((resolve) => setTimeout(resolve, 500));
+            yield new Promise((resolve) => setTimeout(resolve, 1000));
             if (socket == null) {
-                let err = new Error('PHEA - DTLS: Socket could not be created.');
+                let err = new Error('PHEA: DTLS Socket could not be created.');
             }
             return socket;
         });
     }
     HueDtls.createSocket = createSocket;
-    function createMessage(rgb) {
+    function createMessage(lights) {
+        lights.forEach((light) => {
+            if (light.color.length > 3) {
+                throw new Error("Phea: Malformed Color Array for DTLS Message.");
+            }
+            for (let i = 0; i < 3; i++) {
+                let colorInt = light.color[i];
+                console.log(colorInt);
+                if (!Number.isInteger(colorInt) || colorInt < 0 || colorInt > 255) {
+                    throw new Error("Phea: Color Array for DTLS Message must be integer[][] representing RGB values 0->255.");
+                }
+            }
+        });
         const tempBuffer = [0x48, 0x75, 0x65, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d];
         tempBuffer.push(0x01);
         tempBuffer.push(0x00);
@@ -50,17 +62,17 @@ var HueDtls;
         tempBuffer.push(0x00);
         tempBuffer.push(0x00);
         tempBuffer.push(0x00);
-        for (let n = 0; n < rgb.length; n++) {
+        lights.forEach(light => {
             tempBuffer.push(0x00);
             tempBuffer.push(0x00);
-            tempBuffer.push(n + 1);
-            tempBuffer.push(Math.round(rgb[n][0]));
-            tempBuffer.push(Math.round(rgb[n][0]));
-            tempBuffer.push(Math.round(rgb[n][1]));
-            tempBuffer.push(Math.round(rgb[n][1]));
-            tempBuffer.push(Math.round(rgb[n][2]));
-            tempBuffer.push(Math.round(rgb[n][2]));
-        }
+            tempBuffer.push(Number(light.lightId));
+            tempBuffer.push(Math.round(light.color[0]));
+            tempBuffer.push(Math.round(light.color[0]));
+            tempBuffer.push(Math.round(light.color[1]));
+            tempBuffer.push(Math.round(light.color[1]));
+            tempBuffer.push(Math.round(light.color[2]));
+            tempBuffer.push(Math.round(light.color[2]));
+        });
         return buffer_1.Buffer.from(tempBuffer);
     }
     HueDtls.createMessage = createMessage;

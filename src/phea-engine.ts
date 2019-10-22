@@ -35,7 +35,7 @@ export class PheaEngine {
 
         this.groupId = groupIdStr;
 
-        await this._setupLights(group.lights.length);
+        await this._setupLights(group.lights);
 
         await HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
         
@@ -92,27 +92,25 @@ export class PheaEngine {
             return;
         }
         
-        let rgb: number[][] = [];
+        let lights: any = [];
 
         this.lights.forEach((light) => {
-            rgb.push(light.rgb);
+            lights.push( light.sampleColor() );
         });
 
-        let msg = HueDtls.createMessage(rgb);
+        let msg = HueDtls.createMessage(lights);
         
         this.socket.send(msg, this.opts.dtlsPort);
 
     }
 
-    private _setupLights(numberOfLights: number): void {
+    private _setupLights(lightIDs: string[]): void {
 
         this.lights = [];
 
-        if (numberOfLights > 0) {
-            for(let i = 1; i <= numberOfLights; i++) {
-                this.lights.push(new HueLight(i.toString(), this.opts));
-            }
-        }
+        lightIDs.forEach(lightId => {
+            this.lights.push(new HueLight(lightId.toString(), this.opts));
+        });
 
     }
 

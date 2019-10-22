@@ -24,22 +24,22 @@ export function configureBridgeOptions(options: Options): void {
 
     // Check if opts is null or not dictionary (Mandatory)
     if (options == null || typeof(options) !== 'object') throw new Error(
-        "PHEA [Configuration]: No (or incorrect) configuration dictionary object given. Please see documented examples."
+        "PHEA: No (or incorrect) configuration dictionary object given. Please see documented examples."
     );
 
     // Host Address (Mandatory)
     if (typeof(options.address) !== 'string') throw new Error(
-        "PHEA [Configuration]: 'options.address' type invalid or unspecified. 'address' must be a string containing IP in IPv4 format or domain. Can contain port."
+        "PHEA: 'options.address' type invalid or unspecified. 'address' must be a string containing IP in IPv4 format or domain. Can contain port."
     );
 
     // Username (Mandatory)
     if (typeof(options.username) !== 'string') throw new Error(
-        "PHEA [Configuration]: 'options.username' type invalid or unspecified. Must be string."
+        "PHEA: 'options.username' type invalid or unspecified. Must be string."
     );
 
     // PSK (Mandatory)
     if (typeof(options.psk) !== 'string') throw new Error(
-        "PHEA [Configuration]: 'options.psk' type invalid or unspecified. Must be string."
+        "PHEA: 'options.psk' type invalid or unspecified. Must be string."
     );
 
     // DTLS Updates Per Second (Optional)
@@ -52,7 +52,7 @@ export function configureBridgeOptions(options: Options): void {
             options.dtlsUpdatesPerSecond > Config.DTLS_UPDATES_PER_SECOND_MAX 
     ) {
         throw new Error(
-            "PHEA [Configuration]: 'options.dtlsUpdatesPerSecond' must be of type int between " + 
+            "PHEA: 'options.dtlsUpdatesPerSecond' must be of type int between " + 
             Config.DTLS_UPDATES_PER_SECOND_MIN + " and " + Config.DTLS_UPDATES_PER_SECOND_MAX + " inclusive."
         )
     }
@@ -65,7 +65,7 @@ export function configureBridgeOptions(options: Options): void {
         options.colorUpdatesPerSecond < Config.COLOR_UPDATES_PER_SECOND_MIN || 
         options.colorUpdatesPerSecond > Config.COLOR_UPDATES_PER_SECOND_MAX) {
         throw new Error(
-            "PHEA [Configuration]: 'colorUpdatesPerSecond' must be of type int between " + 
+            "PHEA: 'colorUpdatesPerSecond' must be of type int between " + 
             Config.COLOR_UPDATES_PER_SECOND_MIN + " and " + Config.COLOR_UPDATES_PER_SECOND_MAX + " inclusive."
         )
     }
@@ -77,7 +77,7 @@ export function configureBridgeOptions(options: Options): void {
     else if (typeof(options.dtlsPort) !== 'number' || options.dtlsPort < Config.DTLS_PORT_MIN || 
         options.dtlsPort > Config.DTLS_PORT_MAX) {
         throw new Error(
-            "PHEA [Configuration]: 'dtlsPort' must be of type int between " + 
+            "PHEA: 'dtlsPort' must be of type int between " + 
             Config.DTLS_PORT_MIN + " and " + Config.DTLS_PORT_MAX + " inclusive."
         )
     }
@@ -89,7 +89,7 @@ export function configureBridgeOptions(options: Options): void {
     else if (typeof(options.dtlsTimeoutMs) !== 'number' || options.dtlsTimeoutMs < Config.DTLS_TIMEOUT_MIN || 
         options.dtlsTimeoutMs > Config.DTLS_TIMEOUT_MAX) {
         throw new Error(
-            "PHEA [Configuration]: 'dtlsTimeout' must be of type int between " + 
+            "PHEA: 'dtlsTimeout' must be of type int between " + 
             Config.DTLS_TIMEOUT_MIN + " and " + Config.DTLS_TIMEOUT_MAX + " inclusive."
         )
     }

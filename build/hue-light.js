@@ -11,6 +11,25 @@ class HueLight {
     transitionColor(rgb, tweenTime) {
         this.gen = this.setTransition(rgb, tweenTime);
     }
+    sampleColor() {
+        let sample = [
+            Math.floor(this.rgb[0]),
+            Math.floor(this.rgb[1]),
+            Math.floor(this.rgb[2])
+        ];
+        for (let i = 0; i < 3; i++) {
+            if (sample[i] < 0) {
+                sample[i] = 0;
+            }
+            else if (sample[i] > 255) {
+                sample[i] = 255;
+            }
+        }
+        return {
+            lightId: this.id,
+            color: sample
+        };
+    }
     step() {
         this.gen.next();
     }
@@ -22,8 +41,7 @@ class HueLight {
                 this.rgb[1] += tween.dg;
                 this.rgb[2] += tween.db;
             }
-            let sample = [this.rgb[0], this.rgb[1], this.rgb[2]];
-            yield sample;
+            yield;
         }
     }
     calculateTween(rgb, tweenTime) {

@@ -1,4 +1,5 @@
 import { Options } from "./phea-options";
+import { LightState } from "./phea-light-state";
 
 
 export class HueLight {
@@ -20,6 +21,28 @@ export class HueLight {
         this.gen = this.setTransition(rgb, tweenTime);
     }
 
+    public sampleColor(): LightState {
+    
+        // Convert to integer
+        let sample = [
+            Math.floor(this.rgb[0]), 
+            Math.floor(this.rgb[1]), 
+            Math.floor(this.rgb[2])
+        ]
+
+        // Verify value is in 8-bit color range.
+        for(let i=0; i<3; i++) {
+            if (sample[i] < 0) { sample[i] = 0; }
+            else if (sample[i] > 255) { sample[i] = 255; }
+        }
+
+        return {
+            lightId: this.id,
+            color: sample
+        };
+
+    }
+
     public step(): void {
         this.gen.next();
     }
@@ -30,15 +53,14 @@ export class HueLight {
 
         while(true) {
         
+            // Step Color
             if (tween.frames-- > 0) {
                 this.rgb[0] += tween.dr;
                 this.rgb[1] += tween.dg;
                 this.rgb[2] += tween.db;   
-            } 
+            }
 
-            let sample = [this.rgb[0], this.rgb[1], this.rgb[2]]
-
-            yield sample;
+            yield;
         
         } 
 
