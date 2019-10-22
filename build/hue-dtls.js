@@ -48,7 +48,6 @@ var HueDtls;
             }
             for (let i = 0; i < 3; i++) {
                 let colorInt = light.color[i];
-                console.log(colorInt);
                 if (!Number.isInteger(colorInt) || colorInt < 0 || colorInt > 255) {
                     throw new Error("Phea: Color Array for DTLS Message must be integer[][] representing RGB values 0->255.");
                 }
