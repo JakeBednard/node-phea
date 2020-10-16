@@ -26,10 +26,10 @@ class HueBridge {
         return __awaiter(this, void 0, void 0, function* () {
             let group;
             if (!Number.isInteger(Number(groupId))) {
-                throw new Error("groupId must be int | string [0,16] inclusive.");
+                throw new Error("groupId must be int | string [0,infinity] inclusive.");
             }
-            else if (Number(groupId) < 0 || Number(groupId) > 16) {
-                throw new Error("groupId must be int | string [0,16] inclusive.");
+            else if (Number(groupId) < 0) {
+                throw new Error("groupId must be int | string [0,infinity] inclusive.");
             }
             group = yield hue_http_1.HueHttp.getGroup(this.opts.address, this.opts.username, groupId);
             return group;
