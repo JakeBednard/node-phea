@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.HueBridge = void 0;
 const hue_http_1 = require("./hue-http");
 const phea_engine_1 = require("./phea-engine");
 class HueBridge {

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.configureBridgeOptions = exports.bridge = exports.register = exports.discover = void 0;
 const hue_bridge_1 = require("./hue-bridge");
 const hue_http_1 = require("./hue-http");
 const phea_config_1 = require("./phea-config");
@@ -76,6 +77,14 @@ function configureBridgeOptions(options) {
         options.dtlsTimeoutMs > phea_config_1.Config.DTLS_TIMEOUT_MAX) {
         throw new Error("PHEA: 'dtlsTimeout' must be of type int between " +
             phea_config_1.Config.DTLS_TIMEOUT_MIN + " and " + phea_config_1.Config.DTLS_TIMEOUT_MAX + " inclusive.");
+    }
+    if (options.dtlsListenPort == null) {
+        options.dtlsListenPort = phea_config_1.Config.DTLS_PORT;
+    }
+    else if (typeof (options.dtlsListenPort) !== 'number' || options.dtlsListenPort < phea_config_1.Config.DTLS_PORT_MIN ||
+        options.dtlsListenPort > phea_config_1.Config.DTLS_PORT_MAX) {
+        throw new Error("PHEA: 'dtlsListenPort' must be of type int between " +
+            phea_config_1.Config.DTLS_PORT_MIN + " and " + phea_config_1.Config.DTLS_PORT_MAX + " inclusive.");
     }
 }
 exports.configureBridgeOptions = configureBridgeOptions;

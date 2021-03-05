@@ -5,5 +5,6 @@ export interface Options {
     dtlsUpdatesPerSecond: number;
     colorUpdatesPerSecond: number;
     dtlsPort: number;
+    dtlsListenPort: number;
     dtlsTimeoutMs: number;
 }
