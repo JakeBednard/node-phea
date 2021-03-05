@@ -1,5 +1,5 @@
 import { Options } from "./phea-options";
-import { Socket } from "dgram";
+import { dtls } from "node-dtls-client";
 import { HueHttp } from "./hue-http";
 import { HueDtls } from "./hue-dtls";
 import { HueLight } from "./hue-light";
@@ -11,7 +11,7 @@ export class PheaEngine {
     public running: boolean;
     private colorRenderLoop: any;
     private dtlsUpdateLoop: any;
-    private socket: Socket | null;
+    private socket: dtls.Socket | null;
     private lights: HueLight[];
     private groupId: string;
 
@@ -100,7 +100,7 @@ export class PheaEngine {
 
         let msg = HueDtls.createMessage(lights);
         
-        this.socket.send(msg, this.opts.dtlsPort);
+        this.socket.send(msg);
 
     }
 
