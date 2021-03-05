@@ -40,7 +40,12 @@ export class PheaEngine {
         await HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
         
         this.socket = await HueDtls.createSocket(
-            this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort
+            this.opts.address,
+            this.opts.username,
+            this.opts.psk,
+            this.opts.dtlsTimeoutMs,
+            this.opts.dtlsPort,
+            this.opts.dtlsListenPort
         );
 
         this.running = true;
