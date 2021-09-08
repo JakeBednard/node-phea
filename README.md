@@ -109,7 +109,8 @@ console.log(groups);
 ### Starting/Stopping PHEA DTLS Light Control:
 ```javascript
 try {
-  bridge.start(entertainmentGroupId).on("close", _=> {
+  let connection = await bridge.start(entertainmentGroupId);
+  connection.on("close", _=> {
     //This happens if closing the connection is closed
     //from the Hue app.
     console.log("connection closed");
