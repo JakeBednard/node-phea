@@ -1,7 +1,7 @@
 import { HueHttp } from "./hue-http";
 import { PheaEngine } from "./phea-engine"; 
 import { Options } from "./phea-options";
-
+import { dtls } from "node-dtls-client";
 
 export class HueBridge {
 
@@ -35,7 +35,7 @@ export class HueBridge {
 
     }
 
-    async start(groupId: string): Promise<void> {
+    async start(groupId: string): Promise<dtls.Socket|null> {
 
         if (!Number.isInteger(Number(groupId))) {
             throw new Error("GroupId must be in integer [0,31] inclusive as type string or empty string.");
@@ -46,9 +46,9 @@ export class HueBridge {
 
         if (this.pheaEngine == null) {
             this.pheaEngine = new PheaEngine(this.opts);
-            await this.pheaEngine.start(groupId);
+            return await this.pheaEngine.start(groupId);
         }
-
+        return null;
     }
 
     async stop(): Promise<void> {

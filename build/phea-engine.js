@@ -38,17 +38,22 @@ class PheaEngine {
                 throw new Error("Failed to create DTLS socket: " + error);
             }
             this.running = true;
+            this.socket.on("close", (e) => {
+                this.running = false;
+                this.stop();
+            });
             this.colorRenderLoop = setInterval(() => { this.stepColor(); }, (1000 / this.opts.colorUpdatesPerSecond));
             this.dtlsUpdateLoop = setInterval(() => { this.dtlsUpdate(); }, (1000 / this.opts.dtlsUpdatesPerSecond));
+            return this.socket;
         });
     }
     stop() {
-        this.running = false;
         clearInterval(this.colorRenderLoop);
         clearInterval(this.dtlsUpdateLoop);
-        if (this.socket != null) {
+        if (this.socket != null && this.running) {
             this.socket.close();
         }
+        this.running = false;
         hue_http_1.HueHttp.setEntertainmentMode(false, this.opts.address, this.opts.username, this.groupId);
         this.groupId = "-1";
     }

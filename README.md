@@ -109,7 +109,11 @@ console.log(groups);
 ### Starting/Stopping PHEA DTLS Light Control:
 ```javascript
 try {
-  bridge.start(entertainmentGroupId);
+  bridge.start(entertainmentGroupId).on("close", _=> {
+    //This happens if closing the connection is closed
+    //from the Hue app.
+    console.log("connection closed");
+  });
 }catch(error) {
   if(/DTLS handshake timed out/gi.test(error?.message)) {
     //A connection is most probably still alive for this group

@@ -32,7 +32,7 @@ var HueDtls;
                     .on("error", (e) => {
                     reject(e);
                 })
-                    .on("close", () => {
+                    .on("close", (e) => {
                     reject("DTLS socket closed");
                 })
                     .on("connected", () => {

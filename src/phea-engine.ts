@@ -24,7 +24,7 @@ export class PheaEngine {
         this.groupId = "-1";
     }
 
-    async start(groupIdStr: string): Promise<void> {
+    async start(groupIdStr: string): Promise<dtls.Socket> {
 
         let group: any = await HueHttp.getGroup(this.opts.address, this.opts.username, groupIdStr);
 
@@ -48,21 +48,30 @@ export class PheaEngine {
 
         this.running = true;
 
+        //Detect socket close and kill intervals to avoid
+        //massive spam of console with errors.
+        this.socket.on("close", (e) => {
+            this.running = false;
+            this.stop();
+        })
+
         this.colorRenderLoop = setInterval(() => { this.stepColor() }, (1000 / this.opts.colorUpdatesPerSecond));
         this.dtlsUpdateLoop = setInterval(() => { this.dtlsUpdate() }, (1000 / this.opts.dtlsUpdatesPerSecond));
+
+        return this.socket;
 
     }
 
     public stop(): void {
         
-        this.running = false;
-        
         clearInterval(this.colorRenderLoop);
         clearInterval(this.dtlsUpdateLoop);
 
-        if (this.socket != null) {
+        if (this.socket != null && this.running) {
             this.socket.close();
         }
+        
+        this.running = false;
 
         HueHttp.setEntertainmentMode(false, this.opts.address, this.opts.username, this.groupId);
 

@@ -28,7 +28,7 @@ export namespace HueDtls {
                 reject(e);
             })
 
-            .on("close", () => {  
+            .on("close", (e) => {  
                 reject("DTLS socket closed");
             })
 

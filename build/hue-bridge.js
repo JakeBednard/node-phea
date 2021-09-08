@@ -46,8 +46,9 @@ class HueBridge {
             }
             if (this.pheaEngine == null) {
                 this.pheaEngine = new phea_engine_1.PheaEngine(this.opts);
-                yield this.pheaEngine.start(groupId);
+                return yield this.pheaEngine.start(groupId);
             }
+            return null;
         });
     }
     stop() {

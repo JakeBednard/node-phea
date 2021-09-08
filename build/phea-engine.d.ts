@@ -1,4 +1,5 @@
 import { Options } from "./phea-options";
+import { dtls } from "node-dtls-client";
 export declare class PheaEngine {
     opts: Options;
     running: boolean;
@@ -8,7 +9,7 @@ export declare class PheaEngine {
     private lights;
     private groupId;
     constructor(options: Options);
-    start(groupIdStr: string): Promise<void>;
+    start(groupIdStr: string): Promise<dtls.Socket>;
     stop(): void;
     transition(lightId: string | number, rgb: number[], tweenTime: number): Promise<void>;
     private stepColor;
