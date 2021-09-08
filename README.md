@@ -108,7 +108,17 @@ console.log(groups);
 
 ### Starting/Stopping PHEA DTLS Light Control:
 ```javascript
-bridge.start(entertainmentGroupId);
+try {
+  bridge.start(entertainmentGroupId);
+}catch(error) {
+  if(/DTLS handshake timed out/gi.test(error?.message)) {
+    //A connection is most probably still alive for this group
+    //This can happen if you hot reload your server without
+    //giving enought time to the bridge to timeout the connection
+    //You may want to wait a little and try to connect again if
+    //you endup here
+  }
+}
 
 // ...Light Control Stuff
 
