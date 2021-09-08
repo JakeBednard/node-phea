@@ -1,5 +1,5 @@
 import { Options } from "./phea-options";
-import { Socket } from "dgram";
+import { dtls } from "node-dtls-client";
 import { HueHttp } from "./hue-http";
 import { HueDtls } from "./hue-dtls";
 import { HueLight } from "./hue-light";
@@ -11,7 +11,7 @@ export class PheaEngine {
     public running: boolean;
     private colorRenderLoop: any;
     private dtlsUpdateLoop: any;
-    private socket: Socket | null;
+    private socket!: dtls.Socket;
     private lights: HueLight[];
     private groupId: string;
 
@@ -20,7 +20,6 @@ export class PheaEngine {
         this.running = false;
         this.colorRenderLoop = null;
         this.dtlsUpdateLoop = null;
-        this.socket = null;
         this.lights = [];
         this.groupId = "-1";
     }
@@ -39,9 +38,13 @@ export class PheaEngine {
 
         await HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
         
-        this.socket = await HueDtls.createSocket(
-            this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort
-        );
+        try {
+            this.socket = await HueDtls.createSocket(
+                this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort
+            );
+        }catch(error) {
+            throw new Error("Failed to create DTLS socket: " + error);
+        }
 
         this.running = true;
 
@@ -100,7 +103,11 @@ export class PheaEngine {
 
         let msg = HueDtls.createMessage(lights);
         
-        this.socket.send(msg, this.opts.dtlsPort);
+        try {
+            this.socket.send(msg, <any>this.opts.dtlsPort);
+        }catch(error) {
+            console.log(error);
+        }
 
     }
 

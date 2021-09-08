@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PheaEngine = void 0;
 const hue_http_1 = require("./hue-http");
 const hue_dtls_1 = require("./hue-dtls");
 const hue_light_1 = require("./hue-light");
@@ -18,7 +19,6 @@ class PheaEngine {
         this.running = false;
         this.colorRenderLoop = null;
         this.dtlsUpdateLoop = null;
-        this.socket = null;
         this.lights = [];
         this.groupId = "-1";
     }
@@ -31,7 +31,12 @@ class PheaEngine {
             this.groupId = groupIdStr;
             yield this._setupLights(group.lights);
             yield hue_http_1.HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
-            this.socket = yield hue_dtls_1.HueDtls.createSocket(this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort);
+            try {
+                this.socket = yield hue_dtls_1.HueDtls.createSocket(this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort);
+            }
+            catch (error) {
+                throw new Error("Failed to create DTLS socket: " + error);
+            }
             this.running = true;
             this.colorRenderLoop = setInterval(() => { this.stepColor(); }, (1000 / this.opts.colorUpdatesPerSecond));
             this.dtlsUpdateLoop = setInterval(() => { this.dtlsUpdate(); }, (1000 / this.opts.dtlsUpdatesPerSecond));
@@ -73,7 +78,12 @@ class PheaEngine {
             lights.push(light.sampleColor());
         });
         let msg = hue_dtls_1.HueDtls.createMessage(lights);
-        this.socket.send(msg, this.opts.dtlsPort);
+        try {
+            this.socket.send(msg, this.opts.dtlsPort);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
     _setupLights(lightIDs) {
         this.lights = [];
