@@ -5,51 +5,38 @@ import { LightState } from "./phea-light-state";
 
 export namespace HueDtls {
 
-    export async function createSocket(address: string, username: string, psk: string, timeout: number, port: number, listenPort: number) {
-
-        let socket = null;
-
-        let config = {
-            type: "udp4",
-            port,
-            listenPort,
-            address,
-            psk: { [username]: Buffer.from(psk, 'hex') },
-            cipherSuites: ['TLS_PSK_WITH_AES_128_GCM_SHA256'],
-            timeout: timeout
-        }
-
-        // @ts-ignore
-        socket = await dtls.createSocket(config)
-        .on("message", (msg: string) => { 
-
-        })
-        .on("error", (e: any) => { 
-            let err = new Error(e);
-            //err.code = 'PHEA.HUE_DTLS_CONTROLLER.SOCKET_ERROR';
-            throw err;
-        })
-        .on("close", () => {  
-            //let msg = new Error("PHEA - DTLS: Socket Closed");
-            //msg.code = 'PHEA.HUE_DTLS_CONTROLLER.SOCKET_CLOSED';
-            //throw msg;
-            // I can't remember. I want to say at some point that "close" get's called
-            // on error by dtls-socket. This caused the code to continue to run,
-            // even after a failed startup. By throwing here, I was able to avoid
-            // this condition. If this is still true, the fix will need to look
-            // at state of the socket to determine if it is open.
-
-        });
-
-        await new Promise(
-            (resolve) => setTimeout(resolve, 1000)
-        );
-
-        if (socket == null) {
-            let err = new Error('PHEA: DTLS Socket could not be created.');
-        }
-
-        return socket;
+    export async function createSocket(address: string, username: string, psk: string, timeout: number, 
+        port: number, listenPort: number):Promise<dtls.Socket> {
+        
+            return new Promise((resolve, reject) => {
+            
+            let socket:dtls.Socket;
+    
+            let config = {
+                type: "udp4",
+                port: port,
+                listenPort: listenPort,
+                address: address,
+                psk: { [username]: Buffer.from(psk, 'hex') },
+                cipherSuites: ['TLS_PSK_WITH_AES_128_GCM_SHA256'],
+                timeout: timeout
+            }
+    
+            // @ts-ignore
+            socket = dtls.createSocket(config);
+            socket.on("message", (msg: string) => { 
+    
+                })
+                .on("error", (e: any) => { 
+                    reject(e);
+                })
+                .on("close", (e) => {  
+                    reject("DTLS socket closed");
+                })
+                .on("connected", () => {  
+                    resolve(socket);
+                });
+            })
 
     }
 

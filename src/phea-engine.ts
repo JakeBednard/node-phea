@@ -20,12 +20,11 @@ export class PheaEngine {
         this.running = false;
         this.colorRenderLoop = null;
         this.dtlsUpdateLoop = null;
-        this.socket = null;
         this.lights = [];
         this.groupId = "-1";
     }
 
-    async start(groupIdStr: string): Promise<void> {
+    async start(groupIdStr: string): Promise<dtls.Socket> {
 
         let group: any = await HueHttp.getGroup(this.opts.address, this.opts.username, groupIdStr);
 
@@ -39,32 +38,45 @@ export class PheaEngine {
 
         await HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
         
-        this.socket = await HueDtls.createSocket(
-            this.opts.address,
-            this.opts.username,
-            this.opts.psk,
-            this.opts.dtlsTimeoutMs,
-            this.opts.dtlsPort,
-            this.opts.dtlsListenPort
-        );
+        try {
+            this.socket = await HueDtls.createSocket(
+                this.opts.address, 
+                this.opts.username, 
+                this.opts.psk, 
+                this.opts.dtlsTimeoutMs, 
+                this.opts.dtlsPort, 
+                this.opts.dtlsListenPort
+            );
+        }catch(error) {
+            throw new Error("Failed to create DTLS socket: " + error);
+        }
 
         this.running = true;
 
+        //Detect socket close and kill intervals to avoid
+        //massive spam of console with errors.
+        this.socket.on("close", (e) => {
+            this.running = false;
+            this.stop();
+        })
+
         this.colorRenderLoop = setInterval(() => { this.stepColor() }, (1000 / this.opts.colorUpdatesPerSecond));
         this.dtlsUpdateLoop = setInterval(() => { this.dtlsUpdate() }, (1000 / this.opts.dtlsUpdatesPerSecond));
+
+        return this.socket;
 
     }
 
     public stop(): void {
         
-        this.running = false;
-        
         clearInterval(this.colorRenderLoop);
         clearInterval(this.dtlsUpdateLoop);
 
-        if (this.socket != null) {
+        if (this.socket != null && this.running) {
             this.socket.close();
         }
+        
+        this.running = false;
 
         HueHttp.setEntertainmentMode(false, this.opts.address, this.opts.username, this.groupId);
 
@@ -105,7 +117,11 @@ export class PheaEngine {
 
         let msg = HueDtls.createMessage(lights);
         
-        this.socket.send(msg);
+        try {
+            this.socket.send(msg, <any>this.opts.dtlsPort);
+        }catch(error) {
+            console.log(error);
+        }
 
     }
 

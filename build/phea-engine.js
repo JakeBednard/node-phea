@@ -19,7 +19,6 @@ class PheaEngine {
         this.running = false;
         this.colorRenderLoop = null;
         this.dtlsUpdateLoop = null;
-        this.socket = null;
         this.lights = [];
         this.groupId = "-1";
     }
@@ -32,19 +31,31 @@ class PheaEngine {
             this.groupId = groupIdStr;
             yield this._setupLights(group.lights);
             yield hue_http_1.HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
-            this.socket = yield hue_dtls_1.HueDtls.createSocket(this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort, this.opts.dtlsListenPort);
+
+            try {
+                this.socket = yield hue_dtls_1.HueDtls.createSocket(this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort, this.opts.dtlsListenPort);
+            }
+            catch (error) {
+                throw new Error("Failed to create DTLS socket: " + error);
+            }
+
             this.running = true;
+            this.socket.on("close", (e) => {
+                this.running = false;
+                this.stop();
+            });
             this.colorRenderLoop = setInterval(() => { this.stepColor(); }, (1000 / this.opts.colorUpdatesPerSecond));
             this.dtlsUpdateLoop = setInterval(() => { this.dtlsUpdate(); }, (1000 / this.opts.dtlsUpdatesPerSecond));
+            return this.socket;
         });
     }
     stop() {
-        this.running = false;
         clearInterval(this.colorRenderLoop);
         clearInterval(this.dtlsUpdateLoop);
-        if (this.socket != null) {
+        if (this.socket != null && this.running) {
             this.socket.close();
         }
+        this.running = false;
         hue_http_1.HueHttp.setEntertainmentMode(false, this.opts.address, this.opts.username, this.groupId);
         this.groupId = "-1";
     }
@@ -74,7 +85,13 @@ class PheaEngine {
             lights.push(light.sampleColor());
         });
         let msg = hue_dtls_1.HueDtls.createMessage(lights);
-        this.socket.send(msg);
+
+        try {
+            this.socket.send(msg);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
     _setupLights(lightIDs) {
         this.lights = [];
