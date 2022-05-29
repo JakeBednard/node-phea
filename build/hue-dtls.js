@@ -9,17 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.HueDtls = void 0;
 const buffer_1 = require("buffer");
 const node_dtls_client_1 = require("node-dtls-client");
 var HueDtls;
 (function (HueDtls) {
-    function createSocket(address, username, psk, timeout, port) {
+    function createSocket(address, username, psk, timeout, port, listenPort) {
         return __awaiter(this, void 0, void 0, function* () {
             let socket = null;
             let config = {
                 type: "udp4",
-                port: port,
-                address: address,
+                port,
+                listenPort,
+                address,
                 psk: { [username]: buffer_1.Buffer.from(psk, 'hex') },
                 cipherSuites: ['TLS_PSK_WITH_AES_128_GCM_SHA256'],
                 timeout: timeout

@@ -94,5 +94,17 @@ export function configureBridgeOptions(options: Options): void {
         )
     }
 
+    // dtlsListenPort (Optional)
+    if (options.dtlsListenPort == null) {
+        options.dtlsListenPort = Config.DTLS_PORT;
+    }
+    else if (typeof(options.dtlsListenPort) !== 'number' || options.dtlsListenPort < Config.DTLS_PORT_MIN || 
+        options.dtlsListenPort > Config.DTLS_PORT_MAX) {
+        throw new Error(
+            "PHEA: 'dtlsListenPort' must be of type int between " + 
+            Config.DTLS_PORT_MIN + " and " + Config.DTLS_PORT_MAX + " inclusive."
+        )
+    }
+
 }
 

@@ -5,14 +5,15 @@ import { LightState } from "./phea-light-state";
 
 export namespace HueDtls {
 
-    export async function createSocket(address: string, username: string, psk: string, timeout: number, port: number) {
+    export async function createSocket(address: string, username: string, psk: string, timeout: number, port: number, listenPort: number) {
 
         let socket = null;
 
         let config = {
             type: "udp4",
-            port: port,
-            address: address,
+            port,
+            listenPort,
+            address,
             psk: { [username]: Buffer.from(psk, 'hex') },
             cipherSuites: ['TLS_PSK_WITH_AES_128_GCM_SHA256'],
             timeout: timeout
