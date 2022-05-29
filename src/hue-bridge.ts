@@ -23,10 +23,10 @@ export class HueBridge {
         let group: any;
 
         if (!Number.isInteger(Number(groupId))) {
-            throw new Error("groupId must be int | string [0,16] inclusive.")
+            throw new Error("groupId must be int | string [0,infinity] inclusive.")
         }
-        else if (Number(groupId) < 0 || Number(groupId) > 16) {
-            throw new Error("groupId must be int | string [0,16] inclusive.")
+        else if (Number(groupId) < 0) {
+            throw new Error("groupId must be int | string [0,infinity] inclusive.")
         }
 
         group = await HueHttp.getGroup(this.opts.address, this.opts.username, groupId);
