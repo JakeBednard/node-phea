@@ -16,30 +16,31 @@ var HueDtls;
 (function (HueDtls) {
     function createSocket(address, username, psk, timeout, port, listenPort) {
         return __awaiter(this, void 0, void 0, function* () {
-            let socket = null;
-            let config = {
-                type: "udp4",
-                port,
-                listenPort,
-                address,
-                psk: { [username]: buffer_1.Buffer.from(psk, 'hex') },
-                cipherSuites: ['TLS_PSK_WITH_AES_128_GCM_SHA256'],
-                timeout: timeout
-            };
-            socket = yield node_dtls_client_1.dtls.createSocket(config)
-                .on("message", (msg) => {
-            })
-                .on("error", (e) => {
-                let err = new Error(e);
-                throw err;
-            })
-                .on("close", () => {
+            return new Promise((resolve, reject) => {
+                let socket;
+                let config = {
+                    type: "udp4",
+                    port: port,
+                    listenPort: listenPort,
+                    address: address,
+                    psk: { [username]: buffer_1.Buffer.from(psk, 'hex') },
+                    cipherSuites: ['TLS_PSK_WITH_AES_128_GCM_SHA256'],
+                    timeout: timeout
+                };
+                socket = node_dtls_client_1.dtls.createSocket(config);
+                socket.on("message", (msg) => {
+                })
+                    .on("error", (e) => {
+                    reject(e);
+                })
+                    .on("close", (e) => {
+                    reject("DTLS socket closed");
+                })
+                    .on("connected", () => {
+                    resolve(socket);
+                });
+
             });
-            yield new Promise((resolve) => setTimeout(resolve, 1000));
-            if (socket == null) {
-                let err = new Error('PHEA: DTLS Socket could not be created.');
-            }
-            return socket;
         });
     }
     HueDtls.createSocket = createSocket;

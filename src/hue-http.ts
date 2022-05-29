@@ -31,7 +31,7 @@ export namespace HueHttp {
 
             return bridges;
 
-        } catch (error) {
+        } catch (error:any) {
 
             switch(error.code) {
                 default:
@@ -116,7 +116,7 @@ export namespace HueHttp {
 
             return response;
 
-        } catch (error) {
+        } catch (error:any) {
 
             //error.code = 'PHEA.HUE_API_CONTROLLER.GET_GROUP_FAILURE'; 
             throw Error(error);
