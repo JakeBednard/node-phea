@@ -41,9 +41,6 @@ class HueBridge {
             if (!Number.isInteger(Number(groupId))) {
                 throw new Error("GroupId must be in integer [0,31] inclusive as type string or empty string.");
             }
-            else if (Number(groupId) < 0 || Number(groupId) > 31) {
-                throw new Error("GroupId must be in integer [0,31] inclusive as type string or empty string.");
-            }
             if (this.pheaEngine == null) {
                 this.pheaEngine = new phea_engine_1.PheaEngine(this.opts);
                 return yield this.pheaEngine.start(groupId);

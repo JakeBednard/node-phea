@@ -17,6 +17,7 @@ class PheaEngine {
     constructor(options) {
         this.opts = options;
         this.running = false;
+        this.socket = null;
         this.colorRenderLoop = null;
         this.dtlsUpdateLoop = null;
         this.lights = [];
@@ -31,14 +32,12 @@ class PheaEngine {
             this.groupId = groupIdStr;
             yield this._setupLights(group.lights);
             yield hue_http_1.HueHttp.setEntertainmentMode(true, this.opts.address, this.opts.username, this.groupId);
-
             try {
                 this.socket = yield hue_dtls_1.HueDtls.createSocket(this.opts.address, this.opts.username, this.opts.psk, this.opts.dtlsTimeoutMs, this.opts.dtlsPort, this.opts.dtlsListenPort);
             }
             catch (error) {
                 throw new Error("Failed to create DTLS socket: " + error);
             }
-
             this.running = true;
             this.socket.on("close", (e) => {
                 this.running = false;
@@ -85,9 +84,8 @@ class PheaEngine {
             lights.push(light.sampleColor());
         });
         let msg = hue_dtls_1.HueDtls.createMessage(lights);
-
         try {
-            this.socket.send(msg);
+            this.socket.send(msg, this.opts.dtlsPort);
         }
         catch (error) {
             console.log(error);

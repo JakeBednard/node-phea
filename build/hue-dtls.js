@@ -39,7 +39,6 @@ var HueDtls;
                     .on("connected", () => {
                     resolve(socket);
                 });
-
             });
         });
     }

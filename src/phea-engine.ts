@@ -18,6 +18,7 @@ export class PheaEngine {
     constructor(options: Options) {
         this.opts = options;
         this.running = false;
+        this.socket = null;
         this.colorRenderLoop = null;
         this.dtlsUpdateLoop = null;
         this.lights = [];
