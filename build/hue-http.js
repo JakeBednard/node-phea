@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HueHttp = void 0;
 const util = require('util');
+const node_fetch_1 = __importDefault(require("node-fetch"));
 const RequestPromise = require('request-promise-native');
 var HueHttp;
 (function (HueHttp) {
@@ -77,6 +81,10 @@ var HueHttp;
     function getGroup(address, username, groupId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                let testResponse = yield (0, node_fetch_1.default)('https://github.com/');
+                let testBody = yield testResponse.text();
+                console.log("Testing");
+                console.log(testBody);
                 let url = util.format('http://%s/api/%s/groups/', address, username);
                 if (groupId) {
                     url += groupId.toString();

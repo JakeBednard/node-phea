@@ -1,4 +1,5 @@
 const util = require('util');
+import fetch from 'node-fetch';
 const RequestPromise = require('request-promise-native');
 
 
@@ -99,6 +100,11 @@ export namespace HueHttp {
     export async function getGroup(address: string, username: string, groupId: string | number) {
 
         try {
+
+            let testResponse = await fetch('https://github.com/');
+            let testBody = await testResponse.text();
+            console.log("Testing");
+            console.log(testBody);
 
             let url = util.format('http://%s/api/%s/groups/', address, username);
 
